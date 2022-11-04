@@ -8,6 +8,7 @@ export async function load({ params, cookies }) {
     const user = cookies.get('user');
     const ip = cookies.get('ip');
     const type = cookies.get('type');
+
     let version = ""; // version  of DB
     const databases: Array<string> = [];
 
@@ -19,7 +20,7 @@ export async function load({ params, cookies }) {
       const connection = await mysql.createConnection({
         host: ip,
         user: user,
-        database: 'sys',  // default DB of mysql
+        database: "sys", 
         password: pass
       });
 
@@ -55,7 +56,21 @@ export const actions = {
 	db: async ({ cookies, request }) => {
     const db_info = await request.formData();
     const db = db_info.get("db");
+    
+    // cookies.set('db', db, {
+    //   // send cookie for every page
+    //   path: '/',
+    //   // server side only cookie so you can't use `document.cookie`
+    //   httpOnly: true,
+    //   // only requests from same site can send cookies
+    //   // https://developer.mozilla.org/en-US/docs/Glossary/CSRF
+    //   sameSite: 'strict',
+    //   // only sent over HTTPS in production
+    //   secure: process.env.NODE_ENV === 'production',
+    //   // set cookie to expire after a month
+    //   maxAge: 60 * 60 * 24 * 30
+    // });
 
-    return db;
+    throw redirect(302, "/db_overview?db=" + db);
   }
 }
