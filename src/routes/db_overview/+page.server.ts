@@ -72,10 +72,35 @@ export const actions = {
 			// Array.from(records).forEach(record => rows.push(record.PK_Token));
 			Array.from(cols_raw).forEach(col => cols.push(col.name));
 			
-			return { records: rows, cols: cols, selected: table, query: query };
+			return { records: rows, cols: cols, selected: table, query: query, type: "records" };
 		} catch (error) {
 			console.error(error);
 			return '';
 		}
-    }
+    },
+	struct: async ({ cookies, request }) => {
+		const form_data = await request.formData();
+		const db = form_data.get("db");
+		const table = form_data.get("table");
+		const pass = cookies.get('pass');
+		const user = cookies.get('user');
+		const ip = cookies.get('ip');
+
+		try {
+			const connection = await mysql.createConnection({
+				host: ip,
+				user: user,
+				database: db,
+				password: pass
+			});
+
+			// get version
+			const [fields] = await connection.query('SHOW FIELDS FROM ' + table);
+			
+			return { cols: fields, selected: table, type: "struct"};
+		} catch (error) {
+			console.error(error);
+			return '';
+		}	
+	}
 }
