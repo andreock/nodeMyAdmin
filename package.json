@@ -41,6 +41,7 @@
 		"bootstrap": "^5.2.2",
 		"mssql": "^9.0.1",
 		"mysql2": "^2.3.3",
+		"svelte-dialogs": "^1.2.2",
 		"sveltestrap": "^5.9.0"
 	}
 }

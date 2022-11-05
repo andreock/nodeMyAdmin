@@ -96,11 +96,35 @@ export const actions = {
 
 			// get version
 			const [fields] = await connection.query('SHOW FIELDS FROM ' + table);
-			
-			return { cols: fields, selected: table, type: "struct"};
+
+			return { cols: fields, selected: table, type: "struct", db: db};
 		} catch (error) {
 			console.error(error);
 			return '';
+		}	
+	},
+	delete: async ({ cookies, request }) => {
+		const form_data = await request.formData();
+		const db = form_data.get("db");
+		const table = form_data.get("table");
+		const pass = cookies.get('pass');
+		const user = cookies.get('user');
+		const ip = cookies.get('ip');
+		const col = form_data.get('col');
+		try {
+			const connection = await mysql.createConnection({
+				host: ip,
+				user: user,
+				database: db,
+				password: pass
+			});
+
+			await connection.query('ALTER TABLE ' + table + " DROP COLUMN " + col);
+
+			return { success: true };
+		} catch (error) {
+			console.error(error);
+			return { success: false, error: error};
 		}	
 	}
 }

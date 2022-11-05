@@ -1,5 +1,6 @@
 <script lang="ts">
     export let structure: Table;
+    export let table: string;
 </script>
 
 <div class="table_container">
@@ -23,6 +24,14 @@
                    <td>{field.Null}</td>
                    <td>{field.Default}</td>
                    <td>{field.Extra}</td>
+                   <td>
+                        <form method="POST" action="?/delete">
+                            <input type="hidden" value={field.Field} name="col" />
+                            <input type="hidden" value={table} name="table" />
+                            <input type="hidden" value={structure.db} name="db" />
+                            <button class="btn btn-danger">Delete field</button>
+                        </form>
+                   </td>
                </tr>
            {/each} 
        </tbody>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	 export let records: Table;
+     export let table;
 </script>
 
 <div class="table_container">

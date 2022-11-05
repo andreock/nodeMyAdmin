@@ -3,6 +3,7 @@
 	import Sidebar from '$lib/components/sidebar.svelte';
 	import Struct from '$lib/components/struct.svelte';
 	import { onMount } from 'svelte';
+	import { dialogs } from 'svelte-dialogs';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -19,7 +20,13 @@
 				show_records = true;
 			}else{
 				struct = true;
-			}		
+			}
+			selected = form.selected;
+			if(form.success){
+				dialogs.alert("Column deleted successfully");
+			}else if(form.success != null){
+				dialogs.alert("Error during the deletion of a column. Error: " + form.error);
+			}				
 		}
 	})
 </script>
@@ -45,7 +52,7 @@
 			  <tr>
 				<th scope="row">{table}</th>
 				<th>
-					<form method="POST" action="?/records">
+					<form method="POST" action="?db=/records">
 						<button class="btn btn-primary" value={table} name="table">View records</button>	
 						<input type="hidden" value={data.db} name="db"/>
 					</form>
@@ -66,7 +73,7 @@
 {:else if show_records}
 	<Records records={form}></Records>
 {:else if struct}
-	<Struct structure={form}></Struct>
+	<Struct structure={form} table={selected}></Struct>
 {/if}
 <style>
 	.table_container{
