@@ -52,7 +52,7 @@
 			  <tr>
 				<th scope="row">{table}</th>
 				<th>
-					<form method="POST" action="?db=/records">
+					<form method="POST" action="?/records">
 						<button class="btn btn-primary" value={table} name="table">View records</button>	
 						<input type="hidden" value={data.db} name="db"/>
 					</form>
