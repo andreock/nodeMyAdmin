@@ -11,19 +11,21 @@
 	/** @type {import('./$types').PageForm} */
 	export let form;
 
-	let databases: Array<string> = [], show_records: boolean = false, selected = "", struct = false;
+	let databases: Array<string> = [], show_records: boolean = false, selected = "", struct = false, delete_records = false;
 
 	onMount(() => {
 		databases = JSON.parse(localStorage.getItem("dbs"));
 		if(form != null){
 			if(form.type == "records"){
 				show_records = true;
-			}else{
+			}else if(form.type == "struct"){
 				struct = true;
+			}else{
+				delete_records = true;
 			}
 			selected = form.selected;
 			if(form.success){
-				dialogs.alert("Column deleted successfully");
+				dialogs.alert("Query executed successfully").then(() => location.reload());
 			}else if(form.success != null){
 				dialogs.alert("Error during the deletion of a column. Error: " + form.error);
 			}				
@@ -33,7 +35,7 @@
 
 <Sidebar databases={databases} form={data.db}></Sidebar>
 
-{#if !show_records && !struct}
+{#if !show_records && !struct && !delete_records}
 <!--Main layout-->
 <main>
 	<div class="container pt-4 table_container">
@@ -70,10 +72,12 @@
 		</div>
 	</div>
 </main>
-{:else if show_records}
-	<Records records={form}></Records>
-{:else if struct}
+{:else if show_records && !delete_records}
+	<Records records={form} table={selected}></Records>
+{:else if struct && !delete_records}
 	<Struct structure={form} table={selected}></Struct>
+{:else}
+	<p>Delete record</p>
 {/if}
 <style>
 	.table_container{

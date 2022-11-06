@@ -72,7 +72,7 @@ export const actions = {
 			// Array.from(records).forEach(record => rows.push(record.PK_Token));
 			Array.from(cols_raw).forEach(col => cols.push(col.name));
 			
-			return { records: rows, cols: cols, selected: table, query: query, type: "records" };
+			return { records: rows, cols: cols, selected: table, query: query, type: "records", db: db};
 		} catch (error) {
 			console.error(error);
 			return '';
@@ -121,10 +121,58 @@ export const actions = {
 
 			await connection.query('ALTER TABLE ' + table + " DROP COLUMN " + col);
 
-			return { success: true };
+			return { success: true, type:"delete" };
 		} catch (error) {
 			console.error(error);
 			return { success: false, error: error};
 		}	
+	},
+	delete_record: async ({ cookies, request }) => {
+		const form_data = await request.formData();
+		const values_raw = JSON.parse(form_data.get("values"));
+		const table = form_data.get("table");
+		const index = form_data.get("index");
+		const pass = cookies.get('pass');
+		const user = cookies.get('user');
+		const ip = cookies.get('ip');
+		const db = form_data.get("db");
+
+		let query = "DELETE FROM " + table + " WHERE (";
+
+		const keys = Object.keys(values_raw[index]);
+		const rows = Object.values(values_raw[index]);
+		keys.forEach(function callback(key, i){
+			if(typeof(rows[i]) == "string" && rows[i].includes("T")){
+				// Is a date, we need to convert it to MySql DateTime
+				try {
+					rows[i] = "";
+				} catch (error) {
+					// is not a real date
+				}
+			}
+
+			if( i != keys.length - 1 && rows[i] != ""){
+				query += `${key} = '${rows[i]}' AND `;
+			}
+			else if(rows[i] != ""){
+				query += `${key} = '${rows[i]}' )`; // The last where don't need AND
+			}
+		});
+		try {
+			const connection = await mysql.createConnection({
+				host: ip,
+				user: user,
+				database: db,
+				password: pass
+			});
+
+			await connection.query(query);
+			return { success: true, type:"delete" };
+		} catch (error) {
+			console.error(error);
+			return { success: false, error: error.code, error_message: error.sqlMessage};
+		}	
+		
+		
 	}
 }
