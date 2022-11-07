@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { dialogs } from 'svelte-dialogs';
+	import ModifyDialog from './modify_dialog.svelte';
 	export let records: Table;
     export let table: string;
 	export let db: string;
@@ -23,13 +25,17 @@
 						<td>{value}</td>
 					{/each}
 					<td>
-						<form method="POST" action="?/delete_record">
+						<button class="btn btn-warning" on:click={() => dialogs.modal(ModifyDialog, { records: records.records, db: records.db, table: table, index: i, cols: records.cols, old_db: records.records})}>Modify record</button>
+					</td>
+					<td>
+						<form method="POST" action="?/delete_record" id={"delete: " + i}>
 							<input type="hidden" name="table" value={table}/>
 							<input type="hidden" name="values" value={JSON.stringify(Object.values(records.records))} />
 							<input type="hidden" name="db" value={records.db} />
-							<button class="btn btn-danger" value={i} name="index">Delete records</button>							
+							<button class="btn btn-danger" value={i} name="index">Delete record</button>							
 						</form>
 					</td>
+
 				</tr>
 			{/each}
 		</tbody>

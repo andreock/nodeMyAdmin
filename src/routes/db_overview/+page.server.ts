@@ -41,6 +41,54 @@ export async function load({ request, cookies }) {
 	}
 }
 
+function parse_query(keys, rows, table){
+	let query = "DELETE FROM " + table + " WHERE (";
+	keys.forEach(function callback(key, i){
+		if(typeof(rows[i]) == "string" && rows[i].includes("T")){
+			// Is a date, we need to convert it to MySql DateTime
+			try {
+				rows[i] = "";
+			} catch (error) {
+				// is not a real date
+			}
+		}
+
+		if( i != keys.length - 1 && rows[i] != ""){
+			query += `${key} = '${rows[i]}' AND `;
+		}
+		else if(rows[i] != ""){
+			query += `${key} = '${rows[i]}' )`; // The last where don't need AND
+		}
+	});
+	
+	return query;
+}
+
+function parse_query_update(keys, rows, table){
+	let query = "UPDATE " + table + " SET ";
+	keys.forEach(function callback(key, i){
+		if(typeof(rows[i]) == "string" && rows[i].includes("T")){
+			// Is a date, we need to convert it to MySql DateTime
+			try {
+				rows[i] = "";
+			} catch (error) {
+				// is not a real date
+			}
+		}
+
+		if( i != keys.length - 1 && rows[i] != ""){
+			// query += `'${key}' = '${rows[i]}' ,`;
+			query += "`" + key + "`" + " = " + "'"+ rows[i] + "',";
+		}
+		else if(rows[i] != ""){
+			// query += `'${key}' = '${rows[i]}'`; // The last where don't need AND
+			query += "`" + key + "`" + " = " + "'"+ rows[i] + "'";
+		}
+		});
+	
+	return query;
+}
+
 export const actions = {
 	records: async ({ cookies, request }) => {
 		const form_data = await request.formData();
@@ -71,7 +119,6 @@ export const actions = {
 
 			// Array.from(records).forEach(record => rows.push(record.PK_Token));
 			Array.from(cols_raw).forEach(col => cols.push(col.name));
-			
 			return { records: rows, cols: cols, selected: table, query: query, type: "records", db: db};
 		} catch (error) {
 			console.error(error);
@@ -137,27 +184,11 @@ export const actions = {
 		const ip = cookies.get('ip');
 		const db = form_data.get("db");
 
-		let query = "DELETE FROM " + table + " WHERE (";
-
 		const keys = Object.keys(values_raw[index]);
 		const rows = Object.values(values_raw[index]);
-		keys.forEach(function callback(key, i){
-			if(typeof(rows[i]) == "string" && rows[i].includes("T")){
-				// Is a date, we need to convert it to MySql DateTime
-				try {
-					rows[i] = "";
-				} catch (error) {
-					// is not a real date
-				}
-			}
 
-			if( i != keys.length - 1 && rows[i] != ""){
-				query += `${key} = '${rows[i]}' AND `;
-			}
-			else if(rows[i] != ""){
-				query += `${key} = '${rows[i]}' )`; // The last where don't need AND
-			}
-		});
+		const query = parse_query(keys, rows, table);
+		console.log(query)
 		try {
 			const connection = await mysql.createConnection({
 				host: ip,
@@ -172,7 +203,36 @@ export const actions = {
 			console.error(error);
 			return { success: false, error: error.code, error_message: error.sqlMessage};
 		}	
+	},
+	update: async ({ cookies, request }) => {
+		const form = await request.formData();
+		const values = form.get("values");
+		const pass = cookies.get('pass');
+		const user = cookies.get('user');
+		const ip = cookies.get('ip');
+		const db = form.get("db");
+		const table = form.get("table");
+		const old_table = form.get("old_db");
+
+		const keys = Object.keys(JSON.parse(values));
+		const rows = Object.values(JSON.parse(values));
+		const old_keys = Object.keys(JSON.parse(old_table));
+		const old_rows = Object.values(JSON.parse(old_table));
 		
-		
+		const query  = parse_query_update(keys, rows, table) + parse_query(old_keys, old_rows, table).replace("DELETE FROM " + table, "");
+		console.log(query);
+		try {
+			const connection = await mysql.createConnection({
+				host: ip,
+				user: user,
+				database: db,
+				password: pass
+			});
+			await connection.query(query);
+			return { success: true, type: "update" };
+		} catch (error) {
+			console.error(error);
+			return { success: false, error: error.code, error_message: error.sqlMessage};
+		}
 	}
 }
