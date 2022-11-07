@@ -1,14 +1,15 @@
 <script lang="ts">
 	import Sidebar from '$lib/components/sidebar.svelte';
+	import type { Information } from 'src/app';
 	import { onMount } from 'svelte';
 
 	const version = 0.1;
 
 	/** @type {import('./$types').PageData} */
-	export let data;
+	export let data: Information;
 
 	/** @type {import('./$types').ActionData} */
-	export let form;
+	export let form: any;
 
 	onMount(() => {
 		localStorage.setItem("dbs", JSON.stringify(data.databases));

@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { DialogContent, getClose } from 'svelte-dialogs';
-	export let records, db: string, table: string, index: number, cols, old_db;
+	import { DialogContent, dialogs, getClose } from 'svelte-dialogs';
+	export let records: Array<object>, db: string, table: string, index: number, cols, old_db: Array<object>;
 	
 	function update(){
-		let records_new = structuredClone(records);	// Need because if we update records, we will update also old_db
+		let records_new = structuredClone(records);	// Need because if we update records, we will update also old_db and this broke WHERE clause
 		
 		Object.keys(records_new[index]).forEach((key, i) => {
-			records_new[index][key] = document.getElementById("update" + i).value;
+			const input = document.getElementById("update" + i);
+			if(input instanceof HTMLInputElement)
+				records_new[index][key] = input.value;
 		});
 
         var myHeaders = new Headers();
@@ -28,7 +30,11 @@
         fetch('?/update', requestOptions)
             .then((response) => response.json())
             .then(async (result) => {
-                console.log(result);
+                if(result.success){
+					dialogs.alert("Row updated successfully").then(() => location.reload());
+				}else{
+					dialogs.alert("Error during updating row, error: " + result.error_message);
+				}
         });
 
     }

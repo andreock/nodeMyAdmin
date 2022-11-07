@@ -29,7 +29,7 @@ export async function load({ params, cookies }) {
       version = Object.values(rows[0])[0];
 
       const [databases_raw] = await connection.query('SHOW DATABASES;');
-      databases_raw.forEach(db => {
+      Array.from(databases_raw).forEach(db => {
         databases.push(db.Database);
       }); 
     } catch (error) {

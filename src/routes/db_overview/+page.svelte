@@ -2,19 +2,23 @@
 	import Records from '$lib/components/records.svelte';
 	import Sidebar from '$lib/components/sidebar.svelte';
 	import Struct from '$lib/components/struct.svelte';
+	import type { db_overview_form, db_overview_load } from 'src/app';
 	import { onMount } from 'svelte';
 	import { dialogs } from 'svelte-dialogs';
 
 	/** @type {import('./$types').PageData} */
-	export let data;
+	export let data: db_overview_load;
 
 	/** @type {import('./$types').PageForm} */
-	export let form;
+	export let form: db_overview_form;
 
 	let databases: Array<string> = [], show_records: boolean = false, selected = "", struct = false, delete_records = false;
 
 	onMount(() => {
-		databases = JSON.parse(localStorage.getItem("dbs"));
+		const storage = localStorage.getItem("dbs");
+		if(storage != null)
+			databases = JSON.parse(storage);
+			
 		if(form != null){
 			if(form.type == "records"){
 				show_records = true;
@@ -73,7 +77,7 @@
 	</div>
 </main>
 {:else if show_records && !delete_records}
-	<Records records={form} table={selected}></Records>
+	<Records records={form} table={selected} db={data.db}></Records>
 {:else if struct && !delete_records}
 	<Struct structure={form} table={selected}></Struct>
 {:else}

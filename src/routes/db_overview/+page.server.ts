@@ -37,11 +37,11 @@ export async function load({ request, cookies }) {
 		return { db: db, tables: tables };
 	} catch (error) {
 		console.error(error);
-		return '';
+		return { error: error };
 	}
 }
 
-function parse_query(keys, rows, table){
+function parse_query(keys: Array<string>, rows: Array<string | Date | boolean> , table: string){
 	let query = "DELETE FROM " + table + " WHERE (";
 	keys.forEach(function callback(key, i){
 		if(typeof(rows[i]) == "string" && rows[i].includes("T")){
@@ -64,7 +64,7 @@ function parse_query(keys, rows, table){
 	return query;
 }
 
-function parse_query_update(keys, rows, table){
+function parse_query_update(keys: Array<string>, rows: Array<string | Date | boolean> , table: string){
 	let query = "UPDATE " + table + " SET ";
 	keys.forEach(function callback(key, i){
 		if(typeof(rows[i]) == "string" && rows[i].includes("T")){
@@ -99,7 +99,8 @@ export const actions = {
 		const ip = cookies.get('ip');
 
 		const cols: Array<unknown> = [];
-		const rows: Array<string> = [];
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const rows: Array<any> = [];
 		const query = 'SELECT * FROM ' + table;
 		
 		try {
@@ -112,10 +113,10 @@ export const actions = {
 	
 			// get version
 			const [records, cols_raw] = await connection.query(query);
-			
-			for(let i = 0; i < records.length; i++) {
-				rows.push(records[i]);
-			}
+			if(records instanceof Array)
+				for(let i = 0; i < records.length; i++) {
+					rows.push(records[i]);
+				}
 
 			// Array.from(records).forEach(record => rows.push(record.PK_Token));
 			Array.from(cols_raw).forEach(col => cols.push(col.name));
@@ -199,7 +200,8 @@ export const actions = {
 
 			await connection.query(query);
 			return { success: true, type:"delete" };
-		} catch (error) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
 			console.error(error);
 			return { success: false, error: error.code, error_message: error.sqlMessage};
 		}	
@@ -220,7 +222,7 @@ export const actions = {
 		const old_rows = Object.values(JSON.parse(old_table));
 		
 		const query  = parse_query_update(keys, rows, table) + parse_query(old_keys, old_rows, table).replace("DELETE FROM " + table, "");
-		console.log(query);
+
 		try {
 			const connection = await mysql.createConnection({
 				host: ip,
@@ -230,7 +232,8 @@ export const actions = {
 			});
 			await connection.query(query);
 			return { success: true, type: "update" };
-		} catch (error) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
 			console.error(error);
 			return { success: false, error: error.code, error_message: error.sqlMessage};
 		}
