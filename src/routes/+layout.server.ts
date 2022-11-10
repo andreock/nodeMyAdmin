@@ -1,4 +1,3 @@
-import process from 'process';
 import mysql from 'mysql2/promise';
 import { redirect } from '@sveltejs/kit';
 
@@ -9,7 +8,6 @@ export async function load({ params, cookies }) {
     const ip = cookies.get('ip');
     const type = cookies.get('type');
 
-    let version = ""; // version  of DB
     const databases: Array<string> = [];
 
     if(user == null || pass == null || ip == null || type == null){
@@ -24,14 +22,11 @@ export async function load({ params, cookies }) {
         password: pass
       });
 
-      // get version
-      const [rows] = await connection.query('SELECT VERSION();');
-      version = Object.values(rows[0])[0];
-
       const [databases_raw] = await connection.query('SHOW DATABASES;');
       Array.from(databases_raw).forEach(db => {
         databases.push(db.Database);
       }); 
+      connection.destroy();
     } catch (error) {
       console.error(error);
       return { success: false };
@@ -39,15 +34,6 @@ export async function load({ params, cookies }) {
 
     return { 
       success: true, 
-      version: process.version,
-      os: process.platform,
-      db:{
-        user: user,
-        pass: pass,
-        ip: ip,
-        type: type,
-        version: version
-      },
       databases: databases
     };
 }

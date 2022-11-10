@@ -33,7 +33,7 @@ export async function load({ request, cookies }) {
 		const [tables_raw] = await connection.query('SHOW TABLES;');
 
 		Array.from(tables_raw).forEach((table) => tables.push(Object.values(table)[0]));
-
+		connection.destroy();	// We need to close the connection to prevent saturation of max connections
 		return { db: db, tables: tables };
 	} catch (error) {
 		console.error(error);
@@ -113,7 +113,8 @@ export const actions = {
 			});
 	
 			// get records
-			const [records, rows] = await connection.query(query);
+			const [x, rows] = await connection.query(query);
+			connection.destroy();	// We need to close the connection to prevent saturation of max connections
 			return {success: true, records: Array.from(rows).map(row => { return {
 				name: row["name"],
 				type: row["columnType"]	
@@ -153,6 +154,7 @@ export const actions = {
 
 			// Array.from(records).forEach(record => rows.push(record.PK_Token));
 			Array.from(cols_raw).forEach(col => cols.push(col.name));
+			connection.destroy();	// We need to close the connection to prevent saturation of max connections
 			return { records: rows, cols: cols, selected: table, query: query, type: "records", db: db};
 		} catch (error) {
 			console.error(error);
@@ -177,7 +179,7 @@ export const actions = {
 
 			// get version
 			const [fields] = await connection.query('SHOW FIELDS FROM ' + table);
-
+			connection.destroy();	// We need to close the connection to prevent saturation of max connections
 			return { cols: fields, selected: table, type: "struct", db: db};
 		} catch (error) {
 			console.error(error);
@@ -201,7 +203,7 @@ export const actions = {
 			});
 
 			await connection.query('ALTER TABLE ' + table + " DROP COLUMN " + col);
-
+			connection.destroy();	// We need to close the connection to prevent saturation of max connections
 			return { success: true, type:"delete" };
 		} catch (error) {
 			console.error(error);
@@ -232,6 +234,7 @@ export const actions = {
 			});
 
 			await connection.query(query);
+			connection.destroy();	// We need to close the connection to prevent saturation of max connections
 			return { success: true, type:"delete" };
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
@@ -264,6 +267,7 @@ export const actions = {
 				password: pass
 			});
 			await connection.query(query);
+			connection.destroy();	// We need to close the connection to prevent saturation of max connections
 			return { success: true, type: "update" };
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
@@ -287,6 +291,7 @@ export const actions = {
 				password: pass
 			});
 			await connection.query('INSERT INTO ' + table + ' SET ?', JSON.parse(records));
+			connection.destroy();	// We need to close the connection to prevent saturation of max connections
 			return { success: true, type: "add"};
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
@@ -310,6 +315,7 @@ export const actions = {
 				password: pass
 			});
 			await connection.query("TRUNCATE TABLE " + table);
+			connection.destroy();	// We need to close the connection to prevent saturation of max connections
 			return { success: true, type: "truncate"};
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
@@ -333,6 +339,7 @@ export const actions = {
 				password: pass
 			});
 			await connection.query("DROP TABLE " + table);
+			connection.destroy();	// We need to close the connection to prevent saturation of max connections
 			return { success: true, type: "drop"};
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
@@ -362,6 +369,7 @@ export const actions = {
 				password: pass
 			});
 			const [rows] = await connection.query(query);
+			connection.destroy();	// We need to close the connection to prevent saturation of max connections
 			return { success: true, type: "search", rows: JSON.stringify(rows) };
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
