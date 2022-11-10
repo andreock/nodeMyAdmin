@@ -11,7 +11,7 @@
 	export let form: any;
 
 	onMount(() => {
-		localStorage.setItem("dbs", JSON.stringify(data.databases));
+		localStorage.setItem('dbs', JSON.stringify(data.databases));
 	});
 </script>
 
@@ -83,7 +83,7 @@
 </main>
 
 <style>
-	.details{
+	.details {
 		margin-top: 2em;
 		padding-left: 6em;
 	}

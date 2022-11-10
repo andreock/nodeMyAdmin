@@ -31,11 +31,15 @@
 		rows.forEach((row) => {
 			let input = document.getElementById(row.name);
 			if (input instanceof HTMLInputElement) {
-				if (input.type == 'text' && input.value.length != 0 || input.type == 'date' && input.value.length != 0){
-                    console.log("OK")
+				if (
+					(input.type == 'text' && input.value.length != 0) ||
+					(input.type == 'date' && input.value.length != 0)
+				) {
+					console.log('OK');
 					Object.assign(records, { [row.name]: input.value });
-                }
-				if (input.type == 'checkbox' && input.checked != null) Object.assign(records, { [row.name]: input.checked });
+				}
+				if (input.type == 'checkbox' && input.checked != null)
+					Object.assign(records, { [row.name]: input.checked });
 			}
 		});
 		var myHeaders = new Headers();
@@ -58,8 +62,8 @@
 				if (!result.data.success) {
 					dialogs.alert('Error during insert: ' + result.data.error_message);
 				} else {
-					localStorage.setItem("rows", result.data.rows);
-                    location.href = "/view_search";
+					localStorage.setItem('rows', result.data.rows);
+					location.href = '/view_search';
 				}
 			});
 	}
