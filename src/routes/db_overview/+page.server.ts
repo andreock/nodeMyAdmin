@@ -287,5 +287,51 @@ export const actions = {
 			console.error(error);
 			return { success: false, error: error.code, error_message: error.sqlMessage, type: "add"};
 		}
+	},
+	truncate: async ({ cookies, request }) => {
+		const pass = cookies.get('pass');
+		const user = cookies.get('user');
+		const ip = cookies.get('ip');
+		const form = await request.formData();
+		const db = form.get("db");
+		const table = form.get("table");
+
+		try {
+			const connection = await mysql.createConnection({
+				host: ip,
+				user: user,
+				database: db,
+				password: pass
+			});
+			await connection.query("TRUNCATE TABLE " + table);
+			return { success: true, type: "truncate"};
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
+			console.error(error);
+			return { success: false, error: error.code, error_message: error.sqlMessage, type: "truncate"};
+		}
+	},
+	drop: async ({ cookies, request }) => {
+		const pass = cookies.get('pass');
+		const user = cookies.get('user');
+		const ip = cookies.get('ip');
+		const form = await request.formData();
+		const db = form.get("db");
+		const table = form.get("table");
+
+		try {
+			const connection = await mysql.createConnection({
+				host: ip,
+				user: user,
+				database: db,
+				password: pass
+			});
+			await connection.query("DROP TABLE " + table);
+			return { success: true, type: "drop"};
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
+			console.error(error);
+			return { success: false, error: error.code, error_message: error.sqlMessage, type: "drop"};
+		}
 	}
 }

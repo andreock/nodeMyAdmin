@@ -35,7 +35,27 @@
 				dialogs.alert("Error during the deletion of a column. Error: " + form.error);
 			}				
 		}
-	})
+	});
+	function confirm_action(type: number, table: string){
+		if(type == 0){
+			dialogs.confirm("Are you sure to TRUNCATE " + table + "?").then(response => {
+				if(response){
+					const form = document.getElementById("truncate");
+					if(form instanceof HTMLFormElement)
+						form.submit();
+				}
+			});
+		}else{
+			dialogs.confirm("Are you sure to DROP " + table + "?").then(response => {
+				if(response){
+					const form = document.getElementById("drop");
+					if(form instanceof HTMLFormElement)
+						form.submit();
+				}
+			});		
+		}
+
+	}
 </script>
 
 <Sidebar databases={databases} form={data.db}></Sidebar>
@@ -50,8 +70,6 @@
 			  <tr>
 				<th scope="col">Table</th>
 				<th scope="col">Action</th>
-				<!-- <th scope="col">Last</th>
-				<th scope="col">Handle</th> -->
 			  </tr>
 			</thead>
 			<tbody>
@@ -72,6 +90,20 @@
 				</th>
 				<th>
 					<button class="btn btn-primary" on:click={() => dialogs.modal(Add, {table: table, db: data.db})}>Add record</button>
+				</th>
+				<th>
+					<form method="POST" action="?/truncate" id="truncate">
+						<button class="btn btn-warning" type="button" on:click={() => confirm_action(0, table)}>Truncate table</button>	
+						<input type="hidden" value={table} name="table" />
+						<input type="hidden" value={data.db} name="db"/>
+					</form>
+				</th>
+				<th>
+					<form method="POST" action="?/drop" id="drop">
+						<button class="btn btn-danger" type="button" on:click={() => confirm_action(1, table)}>Drop table</button>	
+						<input type="hidden" value={table} name="table" />
+						<input type="hidden" value={data.db} name="db"/>
+					</form>
 				</th>
 			  </tr>
 			  {/each}
