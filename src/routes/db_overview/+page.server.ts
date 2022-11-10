@@ -11,7 +11,7 @@ export async function load({ request, cookies }) {
 	const tables: Array<string> = []; // The tables in database
 
 	if (user == null || pass == null || ip == null || type == null) {
-		throw redirect(301, '/login');
+		throw redirect(301, '/login');	// Not logged in
 	}
 
 	try {
@@ -52,12 +52,18 @@ function parse_query(keys: Array<string>, rows: Array<string | Date | boolean> ,
 				// is not a real date
 			}
 		}
-
-		if( i != keys.length - 1 && rows[i] != ""){
-			query += `${key} = '${rows[i]}' AND `;
-		}
-		else if(rows[i] != ""){
-			query += `${key} = '${rows[i]}' )`; // The last where don't need AND
+		if(rows[i] != "" || typeof(rows[i]) == "boolean" ){
+			if(i != keys.length - 1){
+				if(typeof(rows[i]) != "boolean")
+					query += `${key} = '${rows[i]}' AND `;
+				else
+					query += `${key} = ${rows[i]} AND `;
+			}else{
+				if(typeof(rows[i]) != "boolean")
+					query += `${key} = '${rows[i]}' )`; // The last where don't need AND
+				else
+					query += `${key} = ${rows[i]} )`; // The last where don't need AND
+			}
 		}
 	});
 	
@@ -333,5 +339,34 @@ export const actions = {
 			console.error(error);
 			return { success: false, error: error.code, error_message: error.sqlMessage, type: "drop"};
 		}
-	}
+	},
+	search: async ({ cookies, request }) => {
+		const pass = cookies.get('pass');
+		const user = cookies.get('user');
+		const ip = cookies.get('ip');
+		const form = await request.formData();
+		const db = form.get("db");
+		const table = form.get("table");
+		const records = form.get("records");
+
+		const keys = Object.keys(JSON.parse(records));
+		const rows = Object.values(JSON.parse(records));
+		let query = parse_query(keys, rows, table);
+		query = query.replace("DELETE FROM", "SELECT * FROM");
+		console.log(query);
+		try {
+			const connection = await mysql.createConnection({
+				host: ip,
+				user: user,
+				database: db,
+				password: pass
+			});
+			const [rows] = await connection.query(query);
+			return { success: true, type: "search", rows: JSON.stringify(rows) };
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
+			console.error(error);
+			return { success: false, error: error.code, error_message: error.sqlMessage, type: "search"};
+		}
+	},
 }

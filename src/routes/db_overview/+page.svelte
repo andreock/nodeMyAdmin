@@ -6,6 +6,7 @@
 	import type { db_overview_form, db_overview_load } from 'src/app';
 	import { onMount } from 'svelte';
 	import { dialogs } from 'svelte-dialogs';
+	import Search from '$lib/components/search.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data: db_overview_load;
@@ -84,12 +85,15 @@
 				</th>
 				<th>
 					<form method="POST" action="?/struct">
-						<button class="btn btn-primary" value={table} name="table">View structure</button>	
+						<button class="btn btn-secondary" value={table} name="table">View structure</button>	
 						<input type="hidden" value={data.db} name="db"/>
 					</form>
 				</th>
 				<th>
-					<button class="btn btn-primary" on:click={() => dialogs.modal(Add, {table: table, db: data.db})}>Add record</button>
+					<button class="btn btn-success" on:click={() => dialogs.modal(Add, {table: table, db: data.db})}>Add record</button>
+				</th>
+				<th>
+					<button class="btn btn-info" on:click={() => dialogs.modal(Search, {table: table, db: data.db})}>Search in table</button>
 				</th>
 				<th>
 					<form method="POST" action="?/truncate" id="truncate">

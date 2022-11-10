@@ -21,7 +21,6 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<Sidebar databases={data.databases} form={form}></Sidebar>
 <!--Main layout-->
 <main>
 	<div class="container pt-4 details">
