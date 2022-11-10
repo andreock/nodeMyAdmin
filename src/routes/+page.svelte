@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Sidebar from '$lib/components/sidebar.svelte';
 	import type { Information } from 'src/app';
 	import { onMount } from 'svelte';
 
