@@ -49,3 +49,12 @@ declare interface Information{
     db: db_version_info;
     databases: Array<string>
 }
+
+declare interface Row{
+    type: number;
+    name: string;
+}
+
+declare interface Insert{
+    [row: string]: string | boolean;
+}

@@ -2,6 +2,7 @@
 	import Records from '$lib/components/records.svelte';
 	import Sidebar from '$lib/components/sidebar.svelte';
 	import Struct from '$lib/components/struct.svelte';
+	import Add from '$lib/components/add.svelte';
 	import type { db_overview_form, db_overview_load } from 'src/app';
 	import { onMount } from 'svelte';
 	import { dialogs } from 'svelte-dialogs';
@@ -68,6 +69,9 @@
 						<button class="btn btn-primary" value={table} name="table">View structure</button>	
 						<input type="hidden" value={data.db} name="db"/>
 					</form>
+				</th>
+				<th>
+					<button class="btn btn-primary" on:click={() => dialogs.modal(Add, {table: table, db: data.db})}>Add record</button>
 				</th>
 			  </tr>
 			  {/each}

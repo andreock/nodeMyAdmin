@@ -90,6 +90,33 @@ function parse_query_update(keys: Array<string>, rows: Array<string | Date | boo
 }
 
 export const actions = {
+	rows: async ({ cookies, request }) => {
+		const form_data = await request.formData();
+		const db = form_data.get("db");
+		const table = form_data.get("table");
+		const pass = cookies.get('pass');
+		const user = cookies.get('user');
+		const ip = cookies.get('ip');
+		const query = 'SELECT * FROM ' + table;
+		try {
+			const connection = await mysql.createConnection({
+				host: ip,
+				user: user,
+				database: db,
+				password: pass
+			});
+	
+			// get records
+			const [records, rows] = await connection.query(query);
+			return {success: true, records: Array.from(rows).map(row => { return {
+				name: row["name"],
+				type: row["columnType"]	
+			};})};
+		} catch (error) {
+			console.error(error);
+			return '';
+		}
+	},
 	records: async ({ cookies, request }) => {
 		const form_data = await request.formData();
 		const db = form_data.get("db");
@@ -189,7 +216,7 @@ export const actions = {
 		const rows = Object.values(values_raw[index]);
 
 		const query = parse_query(keys, rows, table);
-		console.log(query)
+
 		try {
 			const connection = await mysql.createConnection({
 				host: ip,
@@ -236,6 +263,29 @@ export const actions = {
 		} catch (error: any) {
 			console.error(error);
 			return { success: false, error: error.code, error_message: error.sqlMessage};
+		}
+	},
+	add: async ({ cookies, request }) => {
+		const pass = cookies.get('pass');
+		const user = cookies.get('user');
+		const ip = cookies.get('ip');
+		const form = await request.formData();
+		const db = form.get("db");
+		const table = form.get("table");
+		const records = form.get("records");
+		try {
+			const connection = await mysql.createConnection({
+				host: ip,
+				user: user,
+				database: db,
+				password: pass
+			});
+			await connection.query('INSERT INTO ' + table + ' SET ?', JSON.parse(records));
+			return { success: true, type: "add"};
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
+			console.error(error);
+			return { success: false, error: error.code, error_message: error.sqlMessage, type: "add"};
 		}
 	}
 }
