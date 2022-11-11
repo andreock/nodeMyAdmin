@@ -389,5 +389,32 @@ export const actions = {
 			console.error(error);
 			return { success: false, error: error.code, error_message: error.sqlMessage, type: 'search' };
 		}
+	},
+	create: async ({ cookies, request }) => {
+		const form = await request.formData();
+		const pass = cookies.get('pass');
+		const user = cookies.get('user');
+		const ip = cookies.get('ip');
+		const fields = JSON.parse(form.get("fields"));
+
+		let query = "CREATE TABLE " + form.get("table") + " (";
+		Array.from(fields).forEach((field) => query += field + ",");
+		query = query.slice(0, -1) + '';
+		query += ")";
+		try {
+			const connection = await mysql.createConnection({
+				host: ip,
+				user: user,
+				database: form.get("db"),
+				password: pass
+			});
+			await connection.query(query);
+			connection.destroy(); // We need to close the connection to prevent saturation of max connections
+			return { success: true, type: 'create'};
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
+			console.error(error);
+			return { success: false, error: error.code, error_message: error.sqlMessage, type: 'search' };
+		}
 	}
 };

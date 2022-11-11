@@ -7,6 +7,7 @@
 	import { onMount } from 'svelte';
 	import { dialogs } from 'svelte-dialogs';
 	import Search from '$lib/components/search.svelte';
+	import NewTable from '$lib/components/new_table.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data: db_overview_load;
@@ -44,14 +45,14 @@
 		if (type == 0) {
 			dialogs.confirm('Are you sure to TRUNCATE ' + table + '?').then((response) => {
 				if (response) {
-					const form = document.getElementById('truncate');
+					const form = document.getElementById('truncate-' + table);
 					if (form instanceof HTMLFormElement) form.submit();
 				}
 			});
 		} else {
 			dialogs.confirm('Are you sure to DROP ' + table + '?').then((response) => {
 				if (response) {
-					const form = document.getElementById('drop');
+					const form = document.getElementById('drop-' + table);
 					if (form instanceof HTMLFormElement) form.submit();
 				}
 			});
@@ -59,13 +60,14 @@
 	}
 </script>
 
-<Sidebar {databases} form={data.db} />
-
 {#if !show_records && !struct && !delete_records}
 	<!--Main layout-->
 	<main>
 		<div class="container pt-4 table_container">
 			<div class="container text-center details">
+				<button class="btn btn-primary" on:click={() => dialogs.modal(NewTable, { db: data.db })}>
+					Add table
+				</button>
 				<table class="table table-striped table-hover">
 					<thead>
 						<tr>
@@ -106,7 +108,7 @@
 									>
 								</th>
 								<th>
-									<form method="POST" action="?/truncate" id="truncate">
+									<form method="POST" action="?/truncate" id={'truncate-' + table}>
 										<button
 											class="btn btn-warning"
 											type="button"
@@ -117,7 +119,7 @@
 									</form>
 								</th>
 								<th>
-									<form method="POST" action="?/drop" id="drop">
+									<form method="POST" action="?/drop" id={'drop-' + table}>
 										<button
 											class="btn btn-danger"
 											type="button"
