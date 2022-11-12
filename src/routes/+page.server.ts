@@ -7,12 +7,12 @@ export async function load({ params, cookies }) {
 	const pass = cookies.get('pass');
 	const user = cookies.get('user');
 	const ip = cookies.get('ip');
-	const type = cookies.get('type');
+	const type = cookies.get('type'); // type of db
 
 	let version = ''; // version  of DB
 
 	if (user == null || pass == null || ip == null || type == null) {
-		throw redirect(301, '/login');
+		throw redirect(301, '/login'); // If user is not logged in redirect to login
 	}
 
 	try {
@@ -25,7 +25,7 @@ export async function load({ params, cookies }) {
 
 		// get version
 		const [rows] = await connection.query('SELECT VERSION();');
-		version = Object.values(rows[0])[0];
+		version = Object.values(rows[0])[0]; // Version of db
 		connection.destroy();
 	} catch (error) {
 		console.error(error);
@@ -34,9 +34,10 @@ export async function load({ params, cookies }) {
 
 	return {
 		success: true,
-		version: process.version,
-		os: process.platform,
+		version: process.version, // Node js Version
+		os: process.platform, // OS where NodeMyAdmin is running
 		db: {
+			// Info to login on db
 			user: user,
 			pass: pass,
 			ip: ip,
@@ -49,8 +50,8 @@ export async function load({ params, cookies }) {
 export const actions = {
 	db: async ({ cookies, request }) => {
 		const db_info = await request.formData();
-		const db = db_info.get('db');
-		throw redirect(302, '/db_overview?db=' + db);
+		const db = db_info.get('db'); // Get db name
+		throw redirect(302, '/db_overview?db=' + db); // Go to db overview based on db saves on cookies
 	},
 	create: async ({ cookies, request }) => {
 		const form = await request.formData();
@@ -63,7 +64,7 @@ export const actions = {
 				host: ip,
 				user: user,
 				password: pass,
-				database: 'sys' // Default database of MySQL
+				database: 'sys' // Default database of MySQL, we don't know what db is selected since we want to create a new one
 			});
 			connection.connect();
 			await connection.query('CREATE DATABASE ' + form.get('db'));

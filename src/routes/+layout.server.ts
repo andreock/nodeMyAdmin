@@ -22,7 +22,7 @@ export async function load({ params, cookies }) {
 			password: pass
 		});
 
-		const [databases_raw] = await connection.query('SHOW DATABASES;');
+		const [databases_raw] = await connection.query('SHOW DATABASES;'); // Get all databases
 		Array.from(databases_raw).forEach((db) => {
 			databases.push(db.Database);
 		});

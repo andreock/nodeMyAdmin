@@ -1,7 +1,7 @@
 export const actions = {
 	login: async ({ cookies, request }) => {
 		const form_data = await request.formData();
-
+		// Save all in cookies, we need for other actions
 		cookies.set('ip', form_data.get('ip'), {
 			// send cookie for every page
 			path: '/',

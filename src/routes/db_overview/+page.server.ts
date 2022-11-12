@@ -20,7 +20,7 @@ export async function load({ request, cookies }) {
 		let db = params.split('=')[1];
 
 		if (db == null)
-			// we need this during the query of all records
+			// if for some reason the db is null we use the default db
 			db = 'sys';
 
 		const connection = await mysql.createConnection({
@@ -33,7 +33,7 @@ export async function load({ request, cookies }) {
 		// get version
 		const [tables_raw] = await connection.query('SHOW TABLES;');
 
-		Array.from(tables_raw).forEach((table) => tables.push(Object.values(table)[0]));
+		Array.from(tables_raw).forEach((table) => tables.push(Object.values(table)[0])); // Get all tables in a db
 		connection.destroy(); // We need to close the connection to prevent saturation of max connections
 		return { db: db, tables: tables };
 	} catch (error) {
@@ -55,7 +55,8 @@ function parse_query(keys: Array<string>, rows: Array<string | Date | boolean>, 
 		}
 		if (rows[i] != '' || typeof rows[i] == 'boolean') {
 			if (i != keys.length - 1) {
-				if (typeof rows[i] != 'boolean') query += `${key} = '${rows[i]}' AND `;
+				if (typeof rows[i] != 'boolean')
+					query += `${key} = '${rows[i]}' AND `; // The boolean must be written in query without quotes, with quotes became a string and broke the WHERE clause
 				else query += `${key} = ${rows[i]} AND `;
 			} else {
 				if (typeof rows[i] != 'boolean')
@@ -85,10 +86,9 @@ function parse_query_update(
 		}
 
 		if (i != keys.length - 1 && rows[i] != '') {
-			// query += `'${key}' = '${rows[i]}' ,`;
-			query += '`' + key + '`' + ' = ' + "'" + rows[i] + "',";
+			query += '`' + key + '`' + ' = ' + "'" + rows[i] + "',"; // We may need to convert this form to a template string
 		} else if (rows[i] != '') {
-			// query += `'${key}' = '${rows[i]}'`; // The last where don't need AND
+			// The last where don't need AND
 			query += '`' + key + '`' + ' = ' + "'" + rows[i] + "'";
 		}
 	});
@@ -104,7 +104,6 @@ export const actions = {
 		const pass = cookies.get('pass');
 		const user = cookies.get('user');
 		const ip = cookies.get('ip');
-		const query = 'SELECT * FROM ' + table;
 		try {
 			const connection = await mysql.createConnection({
 				host: ip,
@@ -114,7 +113,7 @@ export const actions = {
 			});
 
 			// get records
-			const [x, rows] = await connection.query(query);
+			const [x, rows] = await connection.query('SELECT * FROM ' + table); // x in not requred
 			connection.destroy(); // We need to close the connection to prevent saturation of max connections
 			return {
 				success: true,
@@ -141,7 +140,6 @@ export const actions = {
 		const cols: Array<unknown> = [];
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const rows: Array<any> = [];
-		const query = 'SELECT * FROM ' + table;
 
 		try {
 			const connection = await mysql.createConnection({
@@ -152,16 +150,23 @@ export const actions = {
 			});
 
 			// get version
-			const [records, cols_raw] = await connection.query(query);
+			const [records, cols_raw] = await connection.query('SELECT * FROM ' + table);
 			if (records instanceof Array)
+				// Get all records
 				for (let i = 0; i < records.length; i++) {
 					rows.push(records[i]);
 				}
 
-			// Array.from(records).forEach(record => rows.push(record.PK_Token));
 			Array.from(cols_raw).forEach((col) => cols.push(col.name));
 			connection.destroy(); // We need to close the connection to prevent saturation of max connections
-			return { records: rows, cols: cols, selected: table, query: query, type: 'records', db: db };
+			return {
+				records: rows,
+				cols: cols,
+				selected: table,
+				query: 'SELECT * FROM ' + table,
+				type: 'records',
+				db: db
+			};
 		} catch (error) {
 			console.error(error);
 			return '';
@@ -208,7 +213,7 @@ export const actions = {
 				password: pass
 			});
 
-			await connection.query('ALTER TABLE ' + table + ' DROP COLUMN ' + col);
+			await connection.query('ALTER TABLE ' + table + ' DROP COLUMN ' + col); // Drop a column in a table
 			connection.destroy(); // We need to close the connection to prevent saturation of max connections
 			return { success: true, type: 'delete' };
 		} catch (error) {
@@ -395,22 +400,22 @@ export const actions = {
 		const pass = cookies.get('pass');
 		const user = cookies.get('user');
 		const ip = cookies.get('ip');
-		const fields = JSON.parse(form.get("fields"));
+		const fields = JSON.parse(form.get('fields'));
 
-		let query = "CREATE TABLE " + form.get("table") + " (";
-		Array.from(fields).forEach((field) => query += field + ",");
+		let query = 'CREATE TABLE ' + form.get('table') + ' (';
+		Array.from(fields).forEach((field) => (query += field + ','));
 		query = query.slice(0, -1) + '';
-		query += ")";
+		query += ')';
 		try {
 			const connection = await mysql.createConnection({
 				host: ip,
 				user: user,
-				database: form.get("db"),
+				database: form.get('db'),
 				password: pass
 			});
 			await connection.query(query);
 			connection.destroy(); // We need to close the connection to prevent saturation of max connections
-			return { success: true, type: 'create'};
+			return { success: true, type: 'create' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			console.error(error);
