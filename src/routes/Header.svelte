@@ -1,7 +1,7 @@
 <header>
 	<nav id="main-navbar" class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
 		<div class="container-fluid">
-			<a class="navbar-brand" href="/index">NodeMyAdmin</a>
+			<a class="navbar-brand" href="/">NodeMyAdmin</a>
 			<button
 				class="navbar-toggler"
 				type="button"

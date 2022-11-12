@@ -10,6 +10,9 @@ export async function load({ params, cookies }) {
 	const type = cookies.get('type'); // type of db
 
 	let version = ''; // version  of DB
+	if (user == null || pass == null || ip == null || type == null) {
+        throw redirect(301, "/login");  
+	}
 
 	try {
 		const connection = await mysql.createConnection({

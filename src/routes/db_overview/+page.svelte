@@ -35,7 +35,7 @@
 			}
 			selected = form.selected;
 			if (form.success) {
-				dialogs.alert('Query executed successfully').then(() => location.reload());
+				dialogs.alert('Query executed successfully').then(() => location.href = "/");
 			} else if (form.success != null) {
 				dialogs.alert('Error during the deletion of a column. Error: ' + form.error);
 			}

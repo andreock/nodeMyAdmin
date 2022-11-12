@@ -10,7 +10,6 @@ export async function load({ params, cookies }) {
 	const databases: Array<string> = [];
 
 	if (user == null || pass == null || ip == null || type == null) {
-		console.log("OK")
 		return {
 			success: true,
 			databases: databases
@@ -37,7 +36,5 @@ export async function load({ params, cookies }) {
 			console.error(error);
 			return { success: false };
 		}
-
-
 	}
 }

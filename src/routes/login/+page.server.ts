@@ -1,5 +1,18 @@
 import { redirect } from '@sveltejs/kit';
 
+/** @type {import('./$types').PageLoad} */
+export async function load({ params, cookies }) {
+	const pass = cookies.get('pass');
+	const user = cookies.get('user');
+	const ip = cookies.get('ip');
+	const type = cookies.get('type');
+	if (user == null || pass == null || ip == null || type == null) {
+		// we are already in logic page
+    }else{
+        throw redirect(301, "/");
+    }
+}
+
 export const actions = {
 	login: async ({ cookies, request }) => {
 		const form_data = await request.formData();
@@ -56,6 +69,6 @@ export const actions = {
 			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
-		throw redirect(302, "/index");
+		throw redirect(302, "/");
 	}
 };
