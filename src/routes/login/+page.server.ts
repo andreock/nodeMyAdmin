@@ -1,8 +1,10 @@
+import { redirect } from '@sveltejs/kit';
+
 export const actions = {
 	login: async ({ cookies, request }) => {
 		const form_data = await request.formData();
 		// Save all in cookies, we need for other actions
-		cookies.set('ip', form_data.get('ip'), {
+		await cookies.set('ip', form_data.get('ip'), {
 			// send cookie for every page
 			path: '/',
 			// server side only cookie so you can't use `document.cookie`
@@ -15,7 +17,7 @@ export const actions = {
 			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
-		cookies.set('user', form_data.get('user'), {
+		await cookies.set('user', form_data.get('user'), {
 			// send cookie for every page
 			path: '/',
 			// server side only cookie so you can't use `document.cookie`
@@ -28,7 +30,7 @@ export const actions = {
 			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
-		cookies.set('pass', form_data.get('pass'), {
+		await cookies.set('pass', form_data.get('pass'), {
 			// send cookie for every page
 			path: '/',
 			// server side only cookie so you can't use `document.cookie`
@@ -41,7 +43,7 @@ export const actions = {
 			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
-		cookies.set('type', form_data.get('type'), {
+		await cookies.set('type', form_data.get('type'), {
 			// send cookie for every page
 			path: '/',
 			// server side only cookie so you can't use `document.cookie`
@@ -54,5 +56,6 @@ export const actions = {
 			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
+		throw redirect(302, "/index");
 	}
 };

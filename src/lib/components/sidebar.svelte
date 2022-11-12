@@ -22,7 +22,7 @@
 					<Fa icon={faPlus} /><span class="dbname">New database</span>
 				</button>
 				{#each databases as database}
-					<form method="POST" action="/?/db">
+					<form method="POST" action="?/db">
 						<button class="list-group-item list-group-item-action py-2 ripple" id={database}>
 							<Fa icon={faDatabase} /><span class="dbname">{database}</span>
 						</button>

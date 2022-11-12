@@ -11,10 +11,6 @@ export async function load({ params, cookies }) {
 
 	let version = ''; // version  of DB
 
-	if (user == null || pass == null || ip == null || type == null) {
-		throw redirect(301, '/login'); // If user is not logged in redirect to login
-	}
-
 	try {
 		const connection = await mysql.createConnection({
 			host: ip,
