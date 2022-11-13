@@ -17,6 +17,5 @@ nodeMyAdmin want to replace phpMyAdmin and want to add support to several DB eng
 
 - Switch to connection pool
 - Add support for SQL Server
-- Add cryptography of credentials
 
 Feel free to contribute opening pull requests or issue to fix/report problems.

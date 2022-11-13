@@ -1,13 +1,14 @@
 import process from 'process';
 import mysql from 'mysql2/promise';
 import { redirect } from '@sveltejs/kit';
+import { decrypt } from '$lib/crypto/aes';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
-	const pass = cookies.get('pass');
-	const user = cookies.get('user');
-	const ip = cookies.get('ip');
-	const type = cookies.get('type'); // type of db
+	const pass = decrypt(cookies.get('pass'));
+	const user = decrypt(cookies.get('user'));
+	const ip = decrypt(cookies.get('ip'));
+	const type = decrypt(cookies.get('type')); // type of db
 
 	let version = ''; // version  of DB
 	if (user == null || pass == null || ip == null || type == null) {
@@ -54,10 +55,10 @@ export const actions = {
 	},
 	create: async ({ cookies, request }) => {
 		const form = await request.formData();
-		const pass = cookies.get('pass');
-		const user = cookies.get('user');
-		const ip = cookies.get('ip');
-
+		const pass = decrypt(cookies.get('pass'));
+		const user = decrypt(cookies.get('user'));
+		const ip = decrypt(cookies.get('ip'));
+		
 		try {
 			const connection = await mysql.createConnection({
 				host: ip,

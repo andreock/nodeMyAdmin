@@ -1,12 +1,13 @@
 import { redirect } from '@sveltejs/kit';
 import mysql from 'mysql2/promise';
+import { encrypt } from '$lib/crypto/aes';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
 	const pass = cookies.get('pass');
 	const user = cookies.get('user');
 	const ip = cookies.get('ip');
-	const type = cookies.get('type');
+	const type = cookies.get('type');	// We don't need to decrypt this because we check only if the informations is present
 	if (user == null || pass == null || ip == null || type == null) {
 		// we are already in login page
     }else{
@@ -35,7 +36,7 @@ export const actions = {
 		}
 
 		// Save all in cookies, we need for other actions
-		await cookies.set('ip', ip, {
+		await cookies.set('ip', encrypt(ip), {
 			// send cookie for every page
 			path: '/',
 			// server side only cookie so you can't use `document.cookie`
@@ -48,7 +49,7 @@ export const actions = {
 			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
-		await cookies.set('user', user, {
+		await cookies.set('user', encrypt(user), {
 			// send cookie for every page
 			path: '/',
 			// server side only cookie so you can't use `document.cookie`
@@ -61,7 +62,7 @@ export const actions = {
 			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
-		await cookies.set('pass', pass, {
+		await cookies.set('pass', encrypt(pass), {
 			// send cookie for every page
 			path: '/',
 			// server side only cookie so you can't use `document.cookie`
@@ -74,7 +75,7 @@ export const actions = {
 			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
-		await cookies.set('type', type, {
+		await cookies.set('type', encrypt(type), {
 			// send cookie for every page
 			path: '/',
 			// server side only cookie so you can't use `document.cookie`

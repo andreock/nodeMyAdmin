@@ -1,11 +1,12 @@
 import mysql from 'mysql2/promise';
+import { decrypt } from '$lib/crypto/aes';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
-	const pass = cookies.get('pass');
-	const user = cookies.get('user');
-	const ip = cookies.get('ip');
-	const type = cookies.get('type');
+	const pass = decrypt(cookies.get('pass'));
+	const user = decrypt(cookies.get('user'));
+	const ip = decrypt(cookies.get('ip'));
+	const type = decrypt(cookies.get('type'));
 
 	const databases: Array<string> = [];
 

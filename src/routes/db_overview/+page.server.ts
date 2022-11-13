@@ -1,12 +1,12 @@
 import mysql from 'mysql2/promise';
 import { redirect } from '@sveltejs/kit';
-
+import { decrypt } from '$lib/crypto/aes';
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ request, cookies }) {
-	const pass = cookies.get('pass');
-	const user = cookies.get('user');
-	const ip = cookies.get('ip');
-	const type = cookies.get('type');
+	const pass = decrypt(cookies.get('pass'));
+	const user = decrypt(cookies.get('user'));
+	const ip = decrypt(cookies.get('ip'));
+	const type = decrypt(cookies.get('type'));
 
 	const tables: Array<string> = []; // The tables in database
 
@@ -101,9 +101,9 @@ export const actions = {
 		const form_data = await request.formData();
 		const db = form_data.get('db');
 		const table = form_data.get('table');
-		const pass = cookies.get('pass');
-		const user = cookies.get('user');
-		const ip = cookies.get('ip');
+		const pass = decrypt(cookies.get('pass'));
+		const user = decrypt(cookies.get('user'));
+		const ip = decrypt(cookies.get('ip'));
 		try {
 			const connection = await mysql.createConnection({
 				host: ip,
@@ -133,9 +133,9 @@ export const actions = {
 		const form_data = await request.formData();
 		const db = form_data.get('db');
 		const table = form_data.get('table');
-		const pass = cookies.get('pass');
-		const user = cookies.get('user');
-		const ip = cookies.get('ip');
+		const pass = decrypt(cookies.get('pass'));
+		const user = decrypt(cookies.get('user'));
+		const ip = decrypt(cookies.get('ip'));
 
 		const cols: Array<unknown> = [];
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -176,9 +176,9 @@ export const actions = {
 		const form_data = await request.formData();
 		const db = form_data.get('db');
 		const table = form_data.get('table');
-		const pass = cookies.get('pass');
-		const user = cookies.get('user');
-		const ip = cookies.get('ip');
+		const pass = decrypt(cookies.get('pass'));
+		const user = decrypt(cookies.get('user'));
+		const ip = decrypt(cookies.get('ip'));
 
 		try {
 			const connection = await mysql.createConnection({
@@ -201,9 +201,9 @@ export const actions = {
 		const form_data = await request.formData();
 		const db = form_data.get('db');
 		const table = form_data.get('table');
-		const pass = cookies.get('pass');
-		const user = cookies.get('user');
-		const ip = cookies.get('ip');
+		const pass = decrypt(cookies.get('pass'));
+		const user = decrypt(cookies.get('user'));
+		const ip = decrypt(cookies.get('ip'));
 		const col = form_data.get('col');
 		try {
 			const connection = await mysql.createConnection({
@@ -226,9 +226,9 @@ export const actions = {
 		const values_raw = JSON.parse(form_data.get('values'));
 		const table = form_data.get('table');
 		const index = form_data.get('index');
-		const pass = cookies.get('pass');
-		const user = cookies.get('user');
-		const ip = cookies.get('ip');
+		const pass = decrypt(cookies.get('pass'));
+		const user = decrypt(cookies.get('user'));
+		const ip = decrypt(cookies.get('ip'));
 		const db = form_data.get('db');
 
 		const keys = Object.keys(values_raw[index]);
@@ -256,9 +256,9 @@ export const actions = {
 	update: async ({ cookies, request }) => {
 		const form = await request.formData();
 		const values = form.get('values');
-		const pass = cookies.get('pass');
-		const user = cookies.get('user');
-		const ip = cookies.get('ip');
+		const pass = decrypt(cookies.get('pass'));
+		const user = decrypt(cookies.get('user'));
+		const ip = decrypt(cookies.get('ip'));
 		const db = form.get('db');
 		const table = form.get('table');
 		const old_table = form.get('old_db');
@@ -289,9 +289,9 @@ export const actions = {
 		}
 	},
 	add: async ({ cookies, request }) => {
-		const pass = cookies.get('pass');
-		const user = cookies.get('user');
-		const ip = cookies.get('ip');
+		const pass = decrypt(cookies.get('pass'));
+		const user = decrypt(cookies.get('user'));
+		const ip = decrypt(cookies.get('ip'));
 		const form = await request.formData();
 		const db = form.get('db');
 		const table = form.get('table');
@@ -313,9 +313,9 @@ export const actions = {
 		}
 	},
 	truncate: async ({ cookies, request }) => {
-		const pass = cookies.get('pass');
-		const user = cookies.get('user');
-		const ip = cookies.get('ip');
+		const pass = decrypt(cookies.get('pass'));
+		const user = decrypt(cookies.get('user'));
+		const ip = decrypt(cookies.get('ip'));
 		const form = await request.formData();
 		const db = form.get('db');
 		const table = form.get('table');
@@ -342,9 +342,9 @@ export const actions = {
 		}
 	},
 	drop: async ({ cookies, request }) => {
-		const pass = cookies.get('pass');
-		const user = cookies.get('user');
-		const ip = cookies.get('ip');
+		const pass = decrypt(cookies.get('pass'));
+		const user = decrypt(cookies.get('user'));
+		const ip = decrypt(cookies.get('ip'));
 		const form = await request.formData();
 		const db = form.get('db');
 		const table = form.get('table');
@@ -366,9 +366,9 @@ export const actions = {
 		}
 	},
 	search: async ({ cookies, request }) => {
-		const pass = cookies.get('pass');
-		const user = cookies.get('user');
-		const ip = cookies.get('ip');
+		const pass = decrypt(cookies.get('pass'));
+		const user = decrypt(cookies.get('user'));
+		const ip = decrypt(cookies.get('ip'));
 		const form = await request.formData();
 		const db = form.get('db');
 		const table = form.get('table');
@@ -397,9 +397,9 @@ export const actions = {
 	},
 	create: async ({ cookies, request }) => {
 		const form = await request.formData();
-		const pass = cookies.get('pass');
-		const user = cookies.get('user');
-		const ip = cookies.get('ip');
+		const pass = decrypt(cookies.get('pass'));
+		const user = decrypt(cookies.get('user'));
+		const ip = decrypt(cookies.get('ip'));
 		const fields = JSON.parse(form.get('fields'));
 
 		let query = 'CREATE TABLE ' + form.get('table') + ' (';
