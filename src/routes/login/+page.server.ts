@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+import mysql from 'mysql2/promise';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
@@ -7,7 +8,7 @@ export async function load({ params, cookies }) {
 	const ip = cookies.get('ip');
 	const type = cookies.get('type');
 	if (user == null || pass == null || ip == null || type == null) {
-		// we are already in logic page
+		// we are already in login page
     }else{
         throw redirect(301, "/");
     }
@@ -16,8 +17,25 @@ export async function load({ params, cookies }) {
 export const actions = {
 	login: async ({ cookies, request }) => {
 		const form_data = await request.formData();
+		const ip = form_data.get('ip');
+		const user = form_data.get('user');
+		const pass = form_data.get('pass');
+		const type = form_data.get('type');
+
+
+		try {	
+			await mysql.createConnection({
+				host: ip,
+				user: user,
+				database: 'sys',
+				password: pass
+			});
+		} catch (error) {
+			return { success: false };
+		}
+
 		// Save all in cookies, we need for other actions
-		await cookies.set('ip', form_data.get('ip'), {
+		await cookies.set('ip', ip, {
 			// send cookie for every page
 			path: '/',
 			// server side only cookie so you can't use `document.cookie`
@@ -30,7 +48,7 @@ export const actions = {
 			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
-		await cookies.set('user', form_data.get('user'), {
+		await cookies.set('user', user, {
 			// send cookie for every page
 			path: '/',
 			// server side only cookie so you can't use `document.cookie`
@@ -43,7 +61,7 @@ export const actions = {
 			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
-		await cookies.set('pass', form_data.get('pass'), {
+		await cookies.set('pass', pass, {
 			// send cookie for every page
 			path: '/',
 			// server side only cookie so you can't use `document.cookie`
@@ -56,7 +74,7 @@ export const actions = {
 			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
-		await cookies.set('type', form_data.get('type'), {
+		await cookies.set('type', type, {
 			// send cookie for every page
 			path: '/',
 			// server side only cookie so you can't use `document.cookie`

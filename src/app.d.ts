@@ -58,3 +58,7 @@ declare interface Row {
 declare interface Insert {
 	[row: string]: string | boolean;
 }
+
+declare interface Login_Response{
+	success: boolean;
+}

@@ -1,9 +1,16 @@
-<script>
+<script lang="ts">
+	import type { Login_Response } from 'src/app';
 	import { onMount } from 'svelte';
+	import { dialogs } from 'svelte-dialogs';
+
+	/** @type {import('./$types').PageForm} */
+	export let form: Login_Response;
 
 	onMount(() => {
 		const header = document.getElementsByTagName('header');
 		header[0].style.display = 'none';
+		if(!form.success)
+			dialogs.alert("Wrong login data, please try again.");
 	});
 </script>
 
