@@ -57,8 +57,10 @@
 </section>
 
 <style>
-	.login {
-		padding: 300px 650px 300px 650px;
+	@media only screen and (min-width: 1920px){
+		.login {
+			padding: 10em 40em 10em 40em;
+		}		
 	}
 	form {
 		background-color: white;
