@@ -3,8 +3,6 @@ import { Buffer } from 'node:buffer';
 import dotenv from 'dotenv';
 dotenv.config();
 export function encrypt(text: string) {
-    dotenv.config();
-
     const pass = crypto.createHash('md5').update(process.env.KEY).digest('hex');
 	const cipher = crypto.createCipheriv(
 		'aes-256-cbc',

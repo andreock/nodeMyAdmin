@@ -10,7 +10,7 @@ const config = {
 	kit: {
 		adapter: adapter({
 			// default options are shown
-			out: 'lib',
+			out: 'build',
 			precompress: true,
 		}),
 		csrf: {

@@ -1,5 +1,5 @@
 // my-server.js
-import { handler } from './lib/handler.js';
+import { handler } from './build/handler.js';
 import express from 'express';
 import compression from 'compression';
 
