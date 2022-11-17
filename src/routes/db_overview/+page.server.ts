@@ -1,6 +1,9 @@
 import mysql from 'mysql2/promise';
 import { redirect } from '@sveltejs/kit';
 import { decrypt } from '$lib/crypto/aes';
+import { create_table_mysql, get_all_tables_mysql } from '$lib/db/mysql/table';
+import { create_table_mssql, get_all_tables_mssql } from '$lib/db/mssql/table';
+
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ request, cookies }) {
 	const pass = decrypt(cookies.get('pass'));
@@ -8,7 +11,6 @@ export async function load({ request, cookies }) {
 	const ip = decrypt(cookies.get('ip'));
 	const type = decrypt(cookies.get('type'));
 
-	const tables: Array<string> = []; // The tables in database
 
 	if (user == null || pass == null || ip == null || type == null) {
 		throw redirect(301, '/login'); // Not logged in
@@ -22,20 +24,12 @@ export async function load({ request, cookies }) {
 		if (db == null)
 			// if for some reason the db is null we use the default db
 			db = 'sys';
+		if(type == "MySql"){
+			return { db: db, tables: get_all_tables_mysql(ip, user, pass, db) };
+		}else if(type == "MSSQL"){
+			return { db: db, tables: get_all_tables_mssql(ip, user, pass, db) };
+		}
 
-		const connection = await mysql.createConnection({
-			host: ip,
-			user: user,
-			database: db,
-			password: pass
-		});
-
-		// get version
-		const [tables_raw] = await connection.query('SHOW TABLES;');
-
-		Array.from(tables_raw).forEach((table) => tables.push(Object.values(table)[0])); // Get all tables in a db
-		connection.destroy(); // We need to close the connection to prevent saturation of max connections
-		return { db: db, tables: tables };
 	} catch (error) {
 		console.error(error);
 		return { error: error };
@@ -401,20 +395,15 @@ export const actions = {
 		const user = decrypt(cookies.get('user'));
 		const ip = decrypt(cookies.get('ip'));
 		const fields = JSON.parse(form.get('fields'));
+		const type = decrypt(cookies.get('type'));
 
-		let query = 'CREATE TABLE ' + form.get('table') + ' (';
-		Array.from(fields).forEach((field) => (query += field + ','));
-		query = query.slice(0, -1) + '';
-		query += ')';
+
 		try {
-			const connection = await mysql.createConnection({
-				host: ip,
-				user: user,
-				database: form.get('db'),
-				password: pass
-			});
-			await connection.query(query);
-			connection.destroy(); // We need to close the connection to prevent saturation of max connections
+			if(type == "MySql")
+				create_table_mysql(ip, user, pass, form.get('db'), form.get("table"), fields);
+			else if(type == "MSSQL")
+				create_table_mssql(ip, user, pass, form.get('db'), form.get("table"), fields);
+				
 			return { success: true, type: 'create' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
