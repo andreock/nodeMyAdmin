@@ -4,6 +4,8 @@ import { redirect } from '@sveltejs/kit';
 import { decrypt } from '$lib/crypto/aes';
 import { get_mysql_version } from '$lib/db/mysql/version';
 import { get_mssql_version } from '$lib/db/mssql/version';
+import { create_db_mysql } from '$lib/db/mysql/database';
+import { create_db_mssql } from '$lib/db/mssql/database';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
@@ -24,7 +26,7 @@ export async function load({ params, cookies }) {
 			console.error(error);
 			return { success: false };
 		}
-	}else{
+	}else if(type == "MSSQL"){
 		try {
 			version = await get_mssql_version(ip, user, pass);
 		} catch (error) {
@@ -60,17 +62,14 @@ export const actions = {
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
 		const ip = decrypt(cookies.get('ip'));
-		
+		const type = decrypt(cookies.get('type')); // type of db
+
 		try {
-			const connection = await mysql.createConnection({
-				host: ip,
-				user: user,
-				password: pass,
-				database: 'sys' // Default database of MySQL, we don't know what db is selected since we want to create a new one
-			});
-			connection.connect();
-			await connection.query('CREATE DATABASE ' + form.get('db'));
-			connection.destroy();
+			if(type == "MySQL"){
+				await create_db_mysql(ip, user, pass, form.get('db'));
+			}else if(type == "MSSQL"){
+				await create_db_mssql(ip, user, pass, form.get('db'));
+			}
 			return { success: true };
 		} catch (error) {
 			return { success: false };

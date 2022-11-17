@@ -8,7 +8,7 @@ export async function get_all_dbs_mssql(ip: string, user: string, password: stri
         database: 'master', // this is the default database
         server: ip,
         pool: {
-            max: 10,
+            max: 1,
             min: 0,
             idleTimeoutMillis: 30000
         },
@@ -25,5 +25,30 @@ export async function get_all_dbs_mssql(ip: string, user: string, password: stri
     } catch (err) {
         console.log(err)
         return [];
+    }
+}
+
+export async function create_db_mssql(ip: string, user: string, password: string, db: string) {
+    const sqlConfig = {
+        user: user,
+        password: password,
+        database: 'master', // this is the default database
+        server: ip,
+        pool: {
+            max: 1,
+            min: 0,
+            idleTimeoutMillis: 30000
+        },
+        options: {
+            encrypt: true, // for azure
+            trustServerCertificate: true // change to true for local dev / self-signed certs
+        }
+    }
+    try {
+        // make sure that any items are correctly URL encoded in the connection string
+        await mssql.connect(sqlConfig)
+        await mssql.query("CREATE DATABASE " + db)
+    } catch (err) {
+        console.log(err)
     }
 }

@@ -15,5 +15,16 @@ export async function get_all_dbs_mysql(ip: string, user: string, pass: string):
     });
     connection.destroy();
     return databases;
+}
 
+export async function create_db_mysql(ip: string, user: string, pass: string, db: string){
+    const connection = await mysql.createConnection({
+        host: ip,
+        user: user,
+        password: pass,
+        database: 'sys' // Default database of MySQL, we don't know what db is selected since we want to create a new one
+    });
+    connection.connect();
+    await connection.query('CREATE DATABASE ' + db);
+    connection.destroy();
 }
