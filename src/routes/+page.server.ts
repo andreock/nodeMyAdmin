@@ -2,6 +2,8 @@ import process from 'process';
 import mysql from 'mysql2/promise';
 import { redirect } from '@sveltejs/kit';
 import { decrypt } from '$lib/crypto/aes';
+import { get_mysql_version } from '$lib/db/mysql/version';
+import { get_mssql_version } from '$lib/db/mssql/version';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
@@ -15,21 +17,20 @@ export async function load({ params, cookies }) {
         throw redirect(301, "/login");  
 	}
 
-	try {
-		const connection = await mysql.createConnection({
-			host: ip,
-			user: user,
-			database: 'sys',
-			password: pass
-		});
-
-		// get version
-		const [rows] = await connection.query('SELECT VERSION();');
-		version = Object.values(rows[0])[0]; // Version of db
-		connection.destroy();
-	} catch (error) {
-		console.error(error);
-		return { success: false };
+	if(type == "MySQL"){
+		try {
+			version = await get_mysql_version(ip, user, pass);
+		} catch (error) {
+			console.error(error);
+			return { success: false };
+		}
+	}else{
+		try {
+			version = await get_mssql_version(ip, user, pass);
+		} catch (error) {
+			console.error(error);
+			return { success: false };			
+		}
 	}
 
 	return {
@@ -45,6 +46,7 @@ export async function load({ params, cookies }) {
 			version: version
 		}
 	};
+	
 }
 
 export const actions = {

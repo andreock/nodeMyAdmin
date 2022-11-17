@@ -2,7 +2,7 @@
 	import type { Information } from 'src/app';
 	import { onMount } from 'svelte';
 
-	const version = '1.0';
+	const version = '1.2';
 
 	/** @type {import('./$types').PageData} */
 	export let data: Information;

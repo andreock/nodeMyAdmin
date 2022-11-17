@@ -62,3 +62,7 @@ declare interface Insert {
 declare interface Login_Response{
 	success: boolean;
 }
+
+declare interface Database {
+	name: string;
+}

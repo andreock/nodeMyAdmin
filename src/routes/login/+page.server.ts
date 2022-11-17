@@ -23,17 +23,16 @@ export const actions = {
 		const pass = form_data.get('pass');
 		const type = form_data.get('type');
 
-
-		try {	
-			await mysql.createConnection({
-				host: ip,
-				user: user,
-				database: 'sys',
-				password: pass
-			});
-		} catch (error) {
-			return { success: false };
-		}
+		// try {	
+		// 	await mysql.createConnection({
+		// 		host: ip,
+		// 		user: user,
+		// 		database: 'sys',
+		// 		password: pass
+		// 	});
+		// } catch (error) {
+		// 	return { success: false };
+		// }
 
 		// Save all in cookies, we need for other actions
 		await cookies.set('ip', encrypt(ip), {
