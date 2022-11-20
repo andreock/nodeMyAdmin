@@ -1,10 +1,10 @@
 import mysql from 'mysql2/promise';
 import { redirect } from '@sveltejs/kit';
 import { decrypt } from '$lib/crypto/aes';
-import { create_table_mysql, delete_field_mysql, drop_table_mysql, get_all_tables_mysql, truncate_table_mysql } from '$lib/db/mysql/table';
-import { create_table_mssql, delete_field_mssql, drop_table_mssql, get_all_tables_mssql, truncate_table_mssql } from '$lib/db/mssql/table';
-import { records_mysql, struct_mysql } from '$lib/db/mysql/record';
-import { records_mssql, struct_mssql } from '$lib/db/mssql/record';
+import { create_table_mysql, delete_field_mysql, drop_table_mysql, get_all_tables_mysql, search_in_table_mysql, truncate_table_mysql } from '$lib/db/mysql/table';
+import { create_table_mssql, delete_field_mssql, drop_table_mssql, get_all_tables_mssql, search_in_table_mssql, truncate_table_mssql } from '$lib/db/mssql/table';
+import { add_record_mysql, records_mysql, struct_mysql } from '$lib/db/mysql/record';
+import { add_record_mssql, records_mssql, struct_mssql } from '$lib/db/mssql/record';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ request, cookies }) {
@@ -103,26 +103,32 @@ export const actions = {
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
 		const ip = decrypt(cookies.get('ip'));
-		try {
-			const connection = await mysql.createConnection({
-				host: ip,
-				user: user,
-				database: db,
-				password: pass
-			});
+		const type = decrypt(cookies.get('type'));
 
-			// get records
-			const [x, rows] = await connection.query('SELECT * FROM ' + table); // x in not requred
-			connection.destroy(); // We need to close the connection to prevent saturation of max connections
-			return {
-				success: true,
-				records: Array.from(rows).map((row) => {
-					return {
-						name: row['name'],
-						type: row['columnType']
-					};
-				})
-			};
+		try {
+			if(type == "MySql"){
+				const rows = await records_mysql(ip, user, pass, db, table);
+				return {
+					success: true,
+					records: rows.cols.map((row) => {
+						return {
+							name: row['name'],
+							type: row['columnType']
+						};
+					})
+				};
+			}else if(type == "MSSQL"){
+				const rows = await struct_mssql(ip, user, pass, db, table);
+				return {
+					success: true,
+					records: rows.map((row) =>{
+						return {
+							name: row['Field'],
+                            type: row['Type']
+						};
+					})
+				};
+			}
 		} catch (error) {
 			console.error(error);
 			return '';
@@ -287,15 +293,14 @@ export const actions = {
 		const db = form.get('db');
 		const table = form.get('table');
 		const records = form.get('records');
+		const type = decrypt(cookies.get('type'));
+
 		try {
-			const connection = await mysql.createConnection({
-				host: ip,
-				user: user,
-				database: db,
-				password: pass
-			});
-			await connection.query('INSERT INTO ' + table + ' SET ?', JSON.parse(records));
-			connection.destroy(); // We need to close the connection to prevent saturation of max connections
+			if(type == "MySql"){
+				await add_record_mysql(ip, user, pass, db, table, records);
+			}else if(type == "MSSQL") {
+				await add_record_mssql(ip, user, pass, db, table, JSON.parse(records));
+			}
 			return { success: true, type: 'add' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
@@ -360,22 +365,14 @@ export const actions = {
 		const db = form.get('db');
 		const table = form.get('table');
 		const records = form.get('records');
+		const type = decrypt(cookies.get('type'));
 
-		const keys = Object.keys(JSON.parse(records));
-		const rows = Object.values(JSON.parse(records));
-		let query = parse_query(keys, rows, table);
-		query = query.replace('DELETE FROM', 'SELECT * FROM');
-		console.log(query);
 		try {
-			const connection = await mysql.createConnection({
-				host: ip,
-				user: user,
-				database: db,
-				password: pass
-			});
-			const [rows] = await connection.query(query);
-			connection.destroy(); // We need to close the connection to prevent saturation of max connections
-			return { success: true, type: 'search', rows: JSON.stringify(rows) };
+			if(type == "MySql") {
+				return { success: true, type: 'search', rows: JSON.stringify(await search_in_table_mysql(ip, user, pass, db, table, JSON.parse(records))) };
+			}else if(type == "MSSQL") {
+				return { success: true, type:'search', rows: JSON.stringify(await search_in_table_mssql(ip, user, pass, db, table, JSON.parse(records))) };
+			}
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			console.error(error);

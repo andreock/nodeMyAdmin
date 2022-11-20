@@ -47,3 +47,18 @@ export async function struct_mysql(ip: string, user: string, pass: string, db: s
         throw error;
     }
 }
+
+export async function add_record_mysql(ip: string, user: string, pass: string, db: string, table: string, records: string) {
+    try {
+        const connection = await mysql.createConnection({
+            host: ip,
+            user: user,
+            database: db,
+            password: pass
+        });
+        await connection.query('INSERT INTO ' + table + ' SET ?', JSON.parse(records));
+        connection.destroy(); // We need to close the connection to prevent saturation of max connections     
+    } catch (error) {
+        throw error;
+    }
+}

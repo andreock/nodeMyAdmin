@@ -1,4 +1,5 @@
 import mysql from 'mysql2/promise';
+import { parse_query } from '../helper/helper';
 
 export async function get_all_tables_mysql(ip: string, user: string, pass: string, db: string){
     try {
@@ -87,5 +88,25 @@ export async function truncate_table_mysql(ip: string, user: string, pass: strin
     } catch (error) {
         throw error;
     }
+}
 
+export async function search_in_table_mysql(ip: string, user: string, pass: string, db: string, table: string, records: object) {
+    try {
+        const keys = Object.keys(records);
+		const rows = Object.values(records);
+		let query = parse_query(keys, rows, table);
+		query = query.replace('DELETE FROM', 'SELECT * FROM');
+		console.log(query);
+        const connection = await mysql.createConnection({
+            host: ip,
+            user: user,
+            database: db,
+            password: pass
+        });
+        const [rows_from_db] = await connection.query(query);
+        connection.destroy(); // We need to close the connection to prevent saturation of max connections
+        return rows_from_db;  
+    } catch (error) {
+        
+    }
 }

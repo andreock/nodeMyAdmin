@@ -71,7 +71,7 @@
 		<div class="mb-3">
 			{#each rows as row, i}
 				<label for={row.name} class="form-label">{row.name + ' - Type: ' + row.type}</label>
-				{#if row.type == 253}
+				{#if row.type == 253 || row.type == 167}
 					<!--Is a string-->
 					<input type="text" id={row.name} class="form-control" />
 				{:else if row.type == 12}
@@ -90,7 +90,7 @@
 			{/each}
 		</div>
 		<a href="#0" on:click={() => window.open('https://stackoverflow.com/a/64774749')}
-			>Types number</a
+			>Types number MySQL</a
 		>
 	</svelte:fragment>
 	<svelte:fragment slot="footer">
