@@ -25,12 +25,13 @@ export async function get_all_tables_mssql(ip: string, user: string, password: s
         });
         return tables;
     } catch (err) {
-        console.log(err)
-        return "";
+        throw err;
+        console.log(err);   
     }
 }
 
 export async function create_table_mssql(ip: string, user: string, password: string, db: string, table: string, fields: Array<string>){
+    console.log(db)
     const sqlConfig = {
         user: user,
         password: password,
@@ -47,18 +48,97 @@ export async function create_table_mssql(ip: string, user: string, password: str
         }
     }
     try {
-        let query = 'CREATE TABLE ' + table + ' (';
+        let query = 'CREATE TABLE ' + db + ".dbo." + table + ' (';
         fields.forEach((field) => (query += field + ','));
         query = query.slice(0, -1) + '';
         query += ')';
+        console.log(query)
         // make sure that any items are correctly URL encoded in the connection string
         await mssql.connect(sqlConfig)
-        const result = await mssql.query(query);
-        const tables = Array.from(result.recordset).map(table => table.name);
-        return tables;
+        await mssql.query(query);
     } catch (err) {
-        console.log(err)
-        return "";
+        throw err;
+        console.log(err);
     }
+}
 
+export async function drop_table_mssql(ip: string, user: string, password: string, db: string, table: string){
+    const sqlConfig = {
+        user: user,
+        password: password,
+        database: db, // this is the default database
+        server: ip,
+        pool: {
+            max: 1,
+            min: 0,
+            idleTimeoutMillis: 30000
+        },
+        options: {
+            encrypt: true, // for azure
+            trustServerCertificate: true // change to true for local dev / self-signed certs
+        }
+    }
+    try {
+        
+        // make sure that any items are correctly URL encoded in the connection string
+        await mssql.connect(sqlConfig)
+        await mssql.query("DROP TABLE " + db + ".dbo." + table);
+    } catch (err) {
+        throw err;
+        console.log(err);
+    }   
+}
+
+export async function truncate_table_mssql(ip: string, user: string, password: string, db: string, table: string){
+    const sqlConfig = {
+        user: user,
+        password: password,
+        database: db, // this is the default database
+        server: ip,
+        pool: {
+            max: 1,
+            min: 0,
+            idleTimeoutMillis: 30000
+        },
+        options: {
+            encrypt: true, // for azure
+            trustServerCertificate: true // change to true for local dev / self-signed certs
+        }
+    }
+    try {
+        
+        // make sure that any items are correctly URL encoded in the connection string
+        await mssql.connect(sqlConfig)
+        await mssql.query("TRUNCATE TABLE " + db + ".dbo." + table);
+    } catch (err) {
+        throw err;
+        console.log(err);
+    }   
+}
+
+export async function delete_field_mssql(ip: string, user: string, password: string, db: string, table: string, col: string){
+    const sqlConfig = {
+        user: user,
+        password: password,
+        database: db, // this is the default database
+        server: ip,
+        pool: {
+            max: 1,
+            min: 0,
+            idleTimeoutMillis: 30000
+        },
+        options: {
+            encrypt: true, // for azure
+            trustServerCertificate: true // change to true for local dev / self-signed certs
+        }
+    }
+    try {
+        
+        // make sure that any items are correctly URL encoded in the connection string
+        await mssql.connect(sqlConfig)
+        await mssql.query('ALTER TABLE ' + db + ".dbo." + table + ' DROP COLUMN ' + col);
+    } catch (err) {
+        throw err;
+        console.log(err);
+    }   
 }

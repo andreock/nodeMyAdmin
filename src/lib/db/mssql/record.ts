@@ -1,11 +1,10 @@
 import mssql from 'mssql';
-import type { Database } from 'src/app';
 
-export async function get_all_dbs_mssql(ip: string, user: string, password: string): Promise<Array<string>> {
+export async function records_mssql(ip: string, user: string, password: string, db: string, table: string){
     const sqlConfig = {
         user: user,
         password: password,
-        database: 'master', // this is the default database
+        database: db, // this is the default database
         server: ip,
         pool: {
             max: 1,
@@ -18,22 +17,22 @@ export async function get_all_dbs_mssql(ip: string, user: string, password: stri
         }
     }
     try {
+        
         // make sure that any items are correctly URL encoded in the connection string
         await mssql.connect(sqlConfig)
-        const result = await mssql.query`SELECT name FROM master.dbo.sysdatabases`
-        return result.recordset.map((x: Database) =>  x.name);
+        const records = await mssql.query("SELECT * FROM " + table);
+        return records.recordset;
     } catch (err) {
         throw err;
-        console.log(err)
-        return [];
-    }
+        console.log(err);
+    }   
 }
 
-export async function create_db_mssql(ip: string, user: string, password: string, db: string) {
+export async function struct_mssql(ip: string, user: string, password: string, db: string, table: string){
     const sqlConfig = {
         user: user,
         password: password,
-        database: 'master', // this is the default database
+        database: db, // this is the default database
         server: ip,
         pool: {
             max: 1,
@@ -46,11 +45,25 @@ export async function create_db_mssql(ip: string, user: string, password: string
         }
     }
     try {
+        const cols = [];
         // make sure that any items are correctly URL encoded in the connection string
         await mssql.connect(sqlConfig)
-        await mssql.query("CREATE DATABASE " + db)
+        const records = await mssql.query("SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('" + table + "')");
+        const cols_raw = records.recordset;
+        console.log(records)
+        cols_raw.forEach((col: { name: any; system_type_id: any; is_nullable: any; }) => {
+            cols.push({
+                Field: col.name,
+                Type: col.system_type_id,
+                Key: "",
+                Null: col.is_nullable,
+                Default: "",
+                Extra: ""
+            })
+        })
+        return cols;
     } catch (err) {
         throw err;
-        console.log(err)
-    }
+        console.log(err);
+    }   
 }
