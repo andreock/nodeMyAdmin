@@ -163,15 +163,10 @@ export async function search_in_table_mssql(ip: string, user: string, password: 
                 trustServerCertificate: true // change to true for local dev / self-signed certs
             }
         }
-        try {
-            // make sure that any items are correctly URL encoded in the connection string
             await mssql.connect(sqlConfig)
             const result = await mssql.query(query);
-            return result.recordset;
-        } catch (err) {
-            throw err;
-        }   
-    } catch (error) {
-        
+            return result.recordset; 
+    } catch (err) {
+        throw err;
     }
 }
