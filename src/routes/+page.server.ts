@@ -19,7 +19,7 @@ export async function load({ cookies }) {
 		throw redirect(301, '/login');
 	}
 
-	if (type == 'MySQL') {
+	if (type == 'MySql') {
 		try {
 			version = await get_mysql_version(ip, user, pass);
 		} catch (error) {
@@ -64,7 +64,7 @@ export const actions = {
 		const type = decrypt(cookies.get('type')); // type of db
 
 		try {
-			if (type == 'MySQL') {
+			if (type == 'MySql') {
 				await create_db_mysql(ip, user, pass, form.get('db'));
 			} else if (type == 'MSSQL') {
 				await create_db_mssql(ip, user, pass, form.get('db'));

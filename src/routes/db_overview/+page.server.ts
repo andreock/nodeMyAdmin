@@ -80,9 +80,10 @@ export const actions = {
 		try {
 			if (type == 'MySql') {
 				const rows = await records_mysql(ip, user, pass, db, table);
+				console.log(rows);
 				return {
 					success: true,
-					records: rows.cols.map((row) => {
+					records: rows.cols_raw.map((row) => {
 						return {
 							name: row['name'],
 							type: row['columnType']

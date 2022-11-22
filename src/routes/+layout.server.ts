@@ -18,7 +18,9 @@ export async function load({ params, cookies }) {
 		};
 	} else {
 		try {
-			if (type == 'MySQL') {
+			console.log(type)
+			if (type == 'MySql') {
+				console.log("OK")
 				return {
 					success: true,
 					databases: await get_all_dbs_mysql(ip, user, pass)

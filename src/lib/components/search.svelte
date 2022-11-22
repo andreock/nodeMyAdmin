@@ -77,7 +77,7 @@
 				{#if row.type == 253 || row.type == 167}
 					<!--Is a string-->
 					<input type="text" id={row.name} class="form-control" />
-				{:else if row.type == 12 || row.type == 61}
+				{:else if row.type == 12 || row.type == 61 || row.type == 7}
 					<input type="date" id={row.name} class="form-control" />
 				{:else if row.type == 1}
 					<div class="form-check">
@@ -88,7 +88,7 @@
 						<input class="form-check-input" type="checkbox" id={row.name} />
 						<label class="form-check-label" for="flexCheckChecked"> False </label>
 					</div>
-				{:else if row.type == 56}
+				{:else if row.type == 56 || row.type == 2}
 					<input type="number" id={row.name} class="form-control" />
 				{/if}
 				<br />

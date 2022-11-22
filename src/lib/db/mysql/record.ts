@@ -29,7 +29,7 @@ export async function records_mysql(
 
 		Array.from(cols_raw).forEach((col) => cols.push(col.name));
 		connection.destroy(); // We need to close the connection to prevent saturation of max connections
-		return { cols: cols, rows: rows };
+		return { cols: cols, rows: rows, cols_raw: cols_raw };
 	} catch (error) {
 		throw error;
 	}
