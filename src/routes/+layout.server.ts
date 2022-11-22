@@ -18,7 +18,7 @@ export async function load({ params, cookies }) {
 		};
 	} else {
 		try {
-			console.log(type)
+			
 			if (type == 'MySql') {
 				console.log("OK")
 				return {
