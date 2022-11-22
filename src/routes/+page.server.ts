@@ -8,7 +8,7 @@ import { create_db_mysql } from '$lib/db/mysql/database';
 import { create_db_mssql } from '$lib/db/mssql/database';
 
 /** @type {import('./$types').PageLoad} */
-export async function load({ params, cookies }) {
+export async function load({ cookies }) {
 	const pass = decrypt(cookies.get('pass'));
 	const user = decrypt(cookies.get('user'));
 	const ip = decrypt(cookies.get('ip'));
@@ -52,7 +52,7 @@ export async function load({ params, cookies }) {
 }
 
 export const actions = {
-	db: async ({ cookies, request }) => {
+	db: async ({ request }) => {
 		const db_info = await request.formData();
 		const db = db_info.get('db'); // Get db name
 		throw redirect(302, '/db_overview?db=' + db); // Go to db overview based on db saves on cookies
@@ -74,5 +74,12 @@ export const actions = {
 		} catch (error) {
 			return { success: false };
 		}
+	},
+	logout: async ({ cookies }) => {
+		cookies.delete('user');
+		cookies.delete('pass');
+        cookies.delete('ip');
+		cookies.delete('type');
+        throw redirect(302, "/login");
 	}
 };
