@@ -32,7 +32,6 @@ export async function get_all_tables_mssql(ip: string, user: string, password: s
 }
 
 export async function create_table_mssql(ip: string, user: string, password: string, db: string, table: string, fields: Array<string>){
-    console.log(db)
     const sqlConfig = {
         user: user,
         password: password,
@@ -53,7 +52,6 @@ export async function create_table_mssql(ip: string, user: string, password: str
         fields.forEach((field) => (query += field + ','));
         query = query.slice(0, -1) + '';
         query += ')';
-        console.log(query)
         // make sure that any items are correctly URL encoded in the connection string
         await mssql.connect(sqlConfig)
         await mssql.query(query);

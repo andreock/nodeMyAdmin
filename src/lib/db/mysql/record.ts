@@ -62,3 +62,35 @@ export async function add_record_mysql(ip: string, user: string, pass: string, d
         throw error;
     }
 }
+
+export async function delete_record_mysql(ip: string, user: string, pass: string, db: string, query: string) {
+    try {
+        const connection = await mysql.createConnection({
+            host: ip,
+            user: user,
+            database: db,
+            password: pass
+        });
+    
+        await connection.query(query);
+        connection.destroy(); // We need to close the connection to prevent saturation of max connections 
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function update_record_mysql(ip: string, user: string, pass: string, db: string, query: string) {
+    try {
+        const connection = await mysql.createConnection({
+            host: ip,
+            user: user,
+            database: db,
+            password: pass
+        });
+    
+        await connection.query(query);
+        connection.destroy(); // We need to close the connection to prevent saturation of max connections 
+    } catch (error) {
+        throw error;
+    }
+}

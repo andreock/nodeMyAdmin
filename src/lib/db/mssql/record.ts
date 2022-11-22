@@ -97,6 +97,55 @@ export async function add_record_mssql(ip: string, user: string, password: strin
         await mssql.query(`INSERT INTO ${db}.dbo.${table} (${cols}) VALUES (${values})`);
     } catch (err) {
         throw err;
-        
+    }   
+}
+
+export async function delete_record_mssql(ip: string, user: string, password: string, db: string, table: string, query: string) {
+    const sqlConfig = {
+        user: user,
+        password: password,
+        database: db, // this is the default database
+        server: ip,
+        pool: {
+            max: 1,
+            min: 0,
+            idleTimeoutMillis: 30000
+        },
+        options: {
+            encrypt: true, // for azure
+            trustServerCertificate: true // change to true for local dev / self-signed certs
+        }
+    }
+    try {
+        // make sure that any items are correctly URL encoded in the connection string
+        await mssql.connect(sqlConfig);
+        await mssql.query(query.replace(table, `${db}.dbo.${table}`));
+    } catch (err) {
+        throw err;
+    }   
+}
+
+export async function update_record_mssql(ip: string, user: string, password: string, db: string, table: string, query: string) {
+    const sqlConfig = {
+        user: user,
+        password: password,
+        database: db, // this is the default database
+        server: ip,
+        pool: {
+            max: 1,
+            min: 0,
+            idleTimeoutMillis: 30000
+        },
+        options: {
+            encrypt: true, // for azure
+            trustServerCertificate: true // change to true for local dev / self-signed certs
+        }
+    }
+    try {
+        // make sure that any items are correctly URL encoded in the connection string
+        await mssql.connect(sqlConfig);
+        await mssql.query(query.replace(table, `${db}.dbo.${table}`));
+    } catch (err) {
+        throw err;
     }   
 }

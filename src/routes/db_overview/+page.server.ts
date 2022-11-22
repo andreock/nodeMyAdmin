@@ -3,8 +3,11 @@ import { redirect } from '@sveltejs/kit';
 import { decrypt } from '$lib/crypto/aes';
 import { create_table_mysql, delete_field_mysql, drop_table_mysql, get_all_tables_mysql, search_in_table_mysql, truncate_table_mysql } from '$lib/db/mysql/table';
 import { create_table_mssql, delete_field_mssql, drop_table_mssql, get_all_tables_mssql, search_in_table_mssql, truncate_table_mssql } from '$lib/db/mssql/table';
-import { add_record_mysql, records_mysql, struct_mysql } from '$lib/db/mysql/record';
-import { add_record_mssql, records_mssql, struct_mssql } from '$lib/db/mssql/record';
+import { add_record_mysql, delete_record_mysql, records_mysql, struct_mysql, update_record_mysql } from '$lib/db/mysql/record';
+import { add_record_mssql, delete_record_mssql, records_mssql, struct_mssql, update_record_mssql } from '$lib/db/mssql/record';
+import { parse_query } from '$lib/db/helper/helper';
+import { parse_query_update_mysql } from '$lib/db/mysql/helper';
+import { parse_query_update_mssql } from '$lib/db/mssql/helper';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ request, cookies }) {
@@ -39,60 +42,6 @@ export async function load({ request, cookies }) {
 		console.error(error);
 		return { error: error };
 	}
-}
-
-function parse_query(keys: Array<string>, rows: Array<string | Date | boolean>, table: string) {
-	let query = 'DELETE FROM ' + table + ' WHERE (';
-	keys.forEach(function callback(key, i) {
-		if (typeof rows[i] == 'string' && rows[i].includes('T')) {
-			// Is a date, we need to convert it to MySql DateTime
-			try {
-				rows[i] = '';
-			} catch (error) {
-				// is not a real date
-			}
-		}
-		if (rows[i] != '' || typeof rows[i] == 'boolean') {
-			if (i != keys.length - 1) {
-				if (typeof rows[i] != 'boolean')
-					query += `${key} = '${rows[i]}' AND `; // The boolean must be written in query without quotes, with quotes became a string and broke the WHERE clause
-				else query += `${key} = ${rows[i]} AND `;
-			} else {
-				if (typeof rows[i] != 'boolean')
-					query += `${key} = '${rows[i]}' )`; // The last where don't need AND
-				else query += `${key} = ${rows[i]} )`; // The last where don't need AND
-			}
-		}
-	});
-
-	return query;
-}
-
-function parse_query_update(
-	keys: Array<string>,
-	rows: Array<string | Date | boolean>,
-	table: string
-) {
-	let query = 'UPDATE ' + table + ' SET ';
-	keys.forEach(function callback(key, i) {
-		if (typeof rows[i] == 'string' && rows[i].includes('T')) {
-			// Is a date, we need to convert it to MySql DateTime
-			try {
-				rows[i] = '';
-			} catch (error) {
-				// is not a real date
-			}
-		}
-
-		if (i != keys.length - 1 && rows[i] != '') {
-			query += '`' + key + '`' + ' = ' + "'" + rows[i] + "',"; // We may need to convert this form to a template string
-		} else if (rows[i] != '') {
-			// The last where don't need AND
-			query += '`' + key + '`' + ' = ' + "'" + rows[i] + "'";
-		}
-	});
-
-	return query;
 }
 
 export const actions = {
@@ -227,6 +176,7 @@ export const actions = {
 		const user = decrypt(cookies.get('user'));
 		const ip = decrypt(cookies.get('ip'));
 		const db = form_data.get('db');
+		const type = decrypt(cookies.get('type'));
 
 		const keys = Object.keys(values_raw[index]);
 		const rows = Object.values(values_raw[index]);
@@ -234,15 +184,11 @@ export const actions = {
 		const query = parse_query(keys, rows, table);
 
 		try {
-			const connection = await mysql.createConnection({
-				host: ip,
-				user: user,
-				database: db,
-				password: pass
-			});
-
-			await connection.query(query);
-			connection.destroy(); // We need to close the connection to prevent saturation of max connections
+			if(type == "MySql"){
+				await delete_record_mysql(ip, user, pass, db, query);
+			}else if(type == "MSSQL"){
+				await delete_record_mssql(ip, user, pass, db, table, query);
+			}
 			return { success: true, type: 'delete' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
@@ -259,25 +205,30 @@ export const actions = {
 		const db = form.get('db');
 		const table = form.get('table');
 		const old_table = form.get('old_db');
+		const type = decrypt(cookies.get('type'));
 
 		const keys = Object.keys(JSON.parse(values));
 		const rows = Object.values(JSON.parse(values));
 		const old_keys = Object.keys(JSON.parse(old_table));
 		const old_rows = Object.values(JSON.parse(old_table));
 
-		const query =
-			parse_query_update(keys, rows, table) +
-			parse_query(old_keys, old_rows, table).replace('DELETE FROM ' + table, '');
+
 
 		try {
-			const connection = await mysql.createConnection({
-				host: ip,
-				user: user,
-				database: db,
-				password: pass
-			});
-			await connection.query(query);
-			connection.destroy(); // We need to close the connection to prevent saturation of max connections
+			if(type == "MySql"){
+				const query =
+				parse_query_update_mysql(keys, rows, table) +
+				parse_query(old_keys, old_rows, table).replace('DELETE FROM ' + table, '');
+
+				await update_record_mysql(ip, user, pass, db, query);
+
+			}else if(type == "MSSQL"){
+				const query =
+				parse_query_update_mssql(keys, rows, table) +
+				parse_query(old_keys, old_rows, table).replace('DELETE FROM ' + table, '');
+
+				await update_record_mssql(ip, user, pass, db, table, query);
+			}
 			return { success: true, type: 'update' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {

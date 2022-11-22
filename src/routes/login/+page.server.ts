@@ -45,13 +45,14 @@ export const actions = {
 					},
 					options: {
 					  encrypt: true, // for azure
-					  trustServerCertificate: false // change to true for local dev / self-signed certs
+					  trustServerCertificate: true // change to true for local dev / self-signed certs
 					}
 				  };
 				  await sql.connect(sqlConfig);
 			}
 
 		} catch (error) {
+			console.error(error);
 			return { success: false };
 		}
 

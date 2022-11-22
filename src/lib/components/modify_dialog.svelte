@@ -34,7 +34,7 @@
 		fetch('?/update', requestOptions)
 			.then((response) => response.json())
 			.then(async (result) => {
-				if (result.success) {
+				if (result.data.success) {
 					dialogs.alert('Row updated successfully').then(() => location.reload());
 				} else {
 					dialogs.alert('Error during updating row, error: ' + result.error_message);

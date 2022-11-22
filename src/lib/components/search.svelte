@@ -35,7 +35,6 @@
 					(input.type == 'text' && input.value.length != 0) ||
 					(input.type == 'date' && input.value.length != 0)
 				) {
-					console.log('OK');
 					Object.assign(records, { [row.name]: input.value });
 				}
 				if (input.type == 'checkbox' && input.checked != null)
@@ -73,12 +72,12 @@
 	<h1 slot="header">Search in {table}</h1>
 	<svelte:fragment slot="body">
 		<div class="mb-3">
-			{#each rows as row, i}
+			{#each rows as row}
 				<label for={row.name} class="form-label">{row.name + ' - Type: ' + row.type}</label>
 				{#if row.type == 253 || row.type == 167}
 					<!--Is a string-->
 					<input type="text" id={row.name} class="form-control" />
-				{:else if row.type == 12}
+				{:else if row.type == 12 || row.type == 61}
 					<input type="date" id={row.name} class="form-control" />
 				{:else if row.type == 1}
 					<div class="form-check">
@@ -89,6 +88,8 @@
 						<input class="form-check-input" type="checkbox" id={row.name} />
 						<label class="form-check-label" for="flexCheckChecked"> False </label>
 					</div>
+				{:else if row.type == 56}
+					<input type="number" id={row.name} class="form-control" />
 				{/if}
 				<br />
 			{/each}
