@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import mysql from 'mysql2/promise';
 import { encrypt } from '$lib/crypto/aes';
+import sql from 'mssql';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
@@ -23,16 +24,36 @@ export const actions = {
 		const pass = form_data.get('pass');
 		const type = form_data.get('type');
 
-		// try {	
-		// 	await mysql.createConnection({
-		// 		host: ip,
-		// 		user: user,
-		// 		database: 'sys',
-		// 		password: pass
-		// 	});
-		// } catch (error) {
-		// 	return { success: false };
-		// }
+		try {	
+			if(type == "MySql"){
+				await mysql.createConnection({
+					host: ip,
+					user: user,
+					database: 'sys',
+					password: pass
+				});
+			}else if(type == "MSSQL"){
+				const sqlConfig = {
+					user: user,
+					password: pass,
+					database: "master",	// default database
+					server: ip,
+					pool: {
+					  max: 1,
+					  min: 0,
+					  idleTimeoutMillis: 30000
+					},
+					options: {
+					  encrypt: true, // for azure
+					  trustServerCertificate: false // change to true for local dev / self-signed certs
+					}
+				  };
+				  await sql.connect(sqlConfig);
+			}
+
+		} catch (error) {
+			return { success: false };
+		}
 
 		// Save all in cookies, we need for other actions
 		await cookies.set('ip', encrypt(ip), {
