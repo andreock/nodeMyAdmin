@@ -15,12 +15,12 @@ export function parse_query_update_mssql(
 		}
 
 		if (i != keys.length - 1 && rows[i] != '') {
-			query +=  key + ' = ' + "'" + rows[i] + "',"; // We may need to convert this form to a template string
+			query += key + ' = ' + "'" + rows[i] + "',"; // We may need to convert this form to a template string
 		} else if (rows[i] != '') {
 			// The last where don't need AND
-			query +=  key + ' = ' + "'" + rows[i] + "'";
+			query += key + ' = ' + "'" + rows[i] + "'";
 		}
 	});
 
 	return query;
-};
+}

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { DialogContent, dialogs, getClose, getOptions } from 'svelte-dialogs';
+	import { DialogContent, dialogs } from 'svelte-dialogs';
 	import { onMount } from 'svelte';
 	import type { Insert, Row } from 'src/app';
-	
+
 	export let table: string, db: string;
 	let rows: Array<Row> = [];
 

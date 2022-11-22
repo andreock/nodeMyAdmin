@@ -1,10 +1,36 @@
 import mysql from 'mysql2/promise';
 import { redirect } from '@sveltejs/kit';
 import { decrypt } from '$lib/crypto/aes';
-import { create_table_mysql, delete_field_mysql, drop_table_mysql, get_all_tables_mysql, search_in_table_mysql, truncate_table_mysql } from '$lib/db/mysql/table';
-import { create_table_mssql, delete_field_mssql, drop_table_mssql, get_all_tables_mssql, search_in_table_mssql, truncate_table_mssql } from '$lib/db/mssql/table';
-import { add_record_mysql, delete_record_mysql, records_mysql, struct_mysql, update_record_mysql } from '$lib/db/mysql/record';
-import { add_record_mssql, delete_record_mssql, records_mssql, struct_mssql, update_record_mssql } from '$lib/db/mssql/record';
+import {
+	create_table_mysql,
+	delete_field_mysql,
+	drop_table_mysql,
+	get_all_tables_mysql,
+	search_in_table_mysql,
+	truncate_table_mysql
+} from '$lib/db/mysql/table';
+import {
+	create_table_mssql,
+	delete_field_mssql,
+	drop_table_mssql,
+	get_all_tables_mssql,
+	search_in_table_mssql,
+	truncate_table_mssql
+} from '$lib/db/mssql/table';
+import {
+	add_record_mysql,
+	delete_record_mysql,
+	records_mysql,
+	struct_mysql,
+	update_record_mysql
+} from '$lib/db/mysql/record';
+import {
+	add_record_mssql,
+	delete_record_mssql,
+	records_mssql,
+	struct_mssql,
+	update_record_mssql
+} from '$lib/db/mssql/record';
 import { parse_query } from '$lib/db/helper/helper';
 import { parse_query_update_mysql } from '$lib/db/mysql/helper';
 import { parse_query_update_mssql } from '$lib/db/mssql/helper';
@@ -16,7 +42,6 @@ export async function load({ request, cookies }) {
 	const ip = decrypt(cookies.get('ip'));
 	const type = decrypt(cookies.get('type'));
 
-
 	if (user == null || pass == null || ip == null || type == null) {
 		throw redirect(301, '/login'); // Not logged in
 	}
@@ -26,18 +51,16 @@ export async function load({ request, cookies }) {
 		const params = url.split('?')[1];
 		let db = params.split('=')[1];
 
-		if (db == null && type == "MySql")
+		if (db == null && type == 'MySql')
 			// if for some reason the db is null we use the default db
 			db = 'sys';
-		else if (type == "MSSQL" && db == null)
-			db = 'master';
+		else if (type == 'MSSQL' && db == null) db = 'master';
 
-		if (type == "MySql") {
+		if (type == 'MySql') {
 			return { db: db, tables: get_all_tables_mysql(ip, user, pass, db) };
-		} else if (type == "MSSQL") {
+		} else if (type == 'MSSQL') {
 			return { db: db, tables: get_all_tables_mssql(ip, user, pass, db) };
 		}
-
 	} catch (error) {
 		console.error(error);
 		return { error: error };
@@ -55,7 +78,7 @@ export const actions = {
 		const type = decrypt(cookies.get('type'));
 
 		try {
-			if(type == "MySql"){
+			if (type == 'MySql') {
 				const rows = await records_mysql(ip, user, pass, db, table);
 				return {
 					success: true,
@@ -66,14 +89,14 @@ export const actions = {
 						};
 					})
 				};
-			}else if(type == "MSSQL"){
+			} else if (type == 'MSSQL') {
 				const rows = await struct_mssql(ip, user, pass, db, table);
 				return {
 					success: true,
-					records: rows.map((row) =>{
+					records: rows.map((row) => {
 						return {
 							name: row['Field'],
-                            type: row['Type']
+							type: row['Type']
 						};
 					})
 				};
@@ -92,9 +115,8 @@ export const actions = {
 		const ip = decrypt(cookies.get('ip'));
 		const type = decrypt(cookies.get('type'));
 
-
 		try {
-			if (type == "MySql") {
+			if (type == 'MySql') {
 				const result = await records_mysql(ip, user, pass, db, table);
 				return {
 					records: result.rows,
@@ -104,21 +126,20 @@ export const actions = {
 					type: 'records',
 					db: db
 				};
-			} else if (type == "MSSQL") {
+			} else if (type == 'MSSQL') {
 				let result = await records_mssql(ip, user, pass, db, table);
-				if(result[0] == null) {
+				if (result[0] == null) {
 					result = [{}];
 				}
 				return {
 					records: result,
-					cols: Object.keys(result[0]),	// We take the first element since is always the same
+					cols: Object.keys(result[0]), // We take the first element since is always the same
 					selected: table,
 					query: 'SELECT * FROM ' + table,
 					type: 'records',
 					db: db
 				};
 			}
-
 		} catch (error) {
 			console.error(error);
 			return '';
@@ -134,10 +155,20 @@ export const actions = {
 		const type = decrypt(cookies.get('type'));
 
 		try {
-			if (type == "MySql") {
-				return { cols: await struct_mysql(ip, user, pass, db, table), selected: table, type: 'struct', db: db };
-			} else if (type == "MSSQL") {
-				return { cols: await struct_mssql(ip, user, pass, db, table), selected: table, type: 'struct', db: db };
+			if (type == 'MySql') {
+				return {
+					cols: await struct_mysql(ip, user, pass, db, table),
+					selected: table,
+					type: 'struct',
+					db: db
+				};
+			} else if (type == 'MSSQL') {
+				return {
+					cols: await struct_mssql(ip, user, pass, db, table),
+					selected: table,
+					type: 'struct',
+					db: db
+				};
 			}
 		} catch (error) {
 			console.error(error);
@@ -155,12 +186,12 @@ export const actions = {
 		const type = decrypt(cookies.get('type'));
 
 		try {
-			if (type == "MySql") {
+			if (type == 'MySql') {
 				await delete_field_mysql(ip, user, pass, db, table, col);
-			} else if (type == "MSSQL") {
+			} else if (type == 'MSSQL') {
 				await delete_field_mssql(ip, user, pass, db, table, col);
 			}
-			console.log("OK")
+			console.log('OK');
 			return { success: true, type: 'delete' };
 		} catch (error) {
 			console.error(error);
@@ -184,9 +215,9 @@ export const actions = {
 		const query = parse_query(keys, rows, table);
 
 		try {
-			if(type == "MySql"){
+			if (type == 'MySql') {
 				await delete_record_mysql(ip, user, pass, db, query);
-			}else if(type == "MSSQL"){
+			} else if (type == 'MSSQL') {
 				await delete_record_mssql(ip, user, pass, db, table, query);
 			}
 			return { success: true, type: 'delete' };
@@ -212,20 +243,17 @@ export const actions = {
 		const old_keys = Object.keys(JSON.parse(old_table));
 		const old_rows = Object.values(JSON.parse(old_table));
 
-
-
 		try {
-			if(type == "MySql"){
+			if (type == 'MySql') {
 				const query =
-				parse_query_update_mysql(keys, rows, table) +
-				parse_query(old_keys, old_rows, table).replace('DELETE FROM ' + table, '');
+					parse_query_update_mysql(keys, rows, table) +
+					parse_query(old_keys, old_rows, table).replace('DELETE FROM ' + table, '');
 
 				await update_record_mysql(ip, user, pass, db, query);
-
-			}else if(type == "MSSQL"){
+			} else if (type == 'MSSQL') {
 				const query =
-				parse_query_update_mssql(keys, rows, table) +
-				parse_query(old_keys, old_rows, table).replace('DELETE FROM ' + table, '');
+					parse_query_update_mssql(keys, rows, table) +
+					parse_query(old_keys, old_rows, table).replace('DELETE FROM ' + table, '');
 
 				await update_record_mssql(ip, user, pass, db, table, query);
 			}
@@ -247,9 +275,9 @@ export const actions = {
 		const type = decrypt(cookies.get('type'));
 
 		try {
-			if(type == "MySql"){
+			if (type == 'MySql') {
 				await add_record_mysql(ip, user, pass, db, table, records);
-			}else if(type == "MSSQL") {
+			} else if (type == 'MSSQL') {
 				await add_record_mssql(ip, user, pass, db, table, JSON.parse(records));
 			}
 			return { success: true, type: 'add' };
@@ -269,9 +297,9 @@ export const actions = {
 		const type = decrypt(cookies.get('type'));
 
 		try {
-			if (type == "MySql") {
+			if (type == 'MySql') {
 				await truncate_table_mysql(ip, user, pass, db, table);
-			} else if (type == "MSSQL") {
+			} else if (type == 'MSSQL') {
 				await truncate_table_mssql(ip, user, pass, db, table);
 			}
 			return { success: true, type: 'truncate' };
@@ -319,10 +347,22 @@ export const actions = {
 		const type = decrypt(cookies.get('type'));
 
 		try {
-			if(type == "MySql") {
-				return { success: true, type: 'search', rows: JSON.stringify(await search_in_table_mysql(ip, user, pass, db, table, JSON.parse(records))) };
-			}else if(type == "MSSQL") {
-				return { success: true, type:'search', rows: JSON.stringify(await search_in_table_mssql(ip, user, pass, db, table, JSON.parse(records))) };
+			if (type == 'MySql') {
+				return {
+					success: true,
+					type: 'search',
+					rows: JSON.stringify(
+						await search_in_table_mysql(ip, user, pass, db, table, JSON.parse(records))
+					)
+				};
+			} else if (type == 'MSSQL') {
+				return {
+					success: true,
+					type: 'search',
+					rows: JSON.stringify(
+						await search_in_table_mssql(ip, user, pass, db, table, JSON.parse(records))
+					)
+				};
 			}
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
@@ -339,10 +379,10 @@ export const actions = {
 		const type = decrypt(cookies.get('type'));
 
 		try {
-			if (type == "MySql")
-				create_table_mysql(ip, user, pass, form.get('db'), form.get("table"), fields);
-			else if (type == "MSSQL")
-				create_table_mssql(ip, user, pass, form.get('db'), form.get("table"), fields);
+			if (type == 'MySql')
+				create_table_mysql(ip, user, pass, form.get('db'), form.get('table'), fields);
+			else if (type == 'MSSQL')
+				create_table_mssql(ip, user, pass, form.get('db'), form.get('table'), fields);
 
 			return { success: true, type: 'create' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,5 +1,8 @@
-
-export function parse_query(keys: Array<string>, rows: Array<string | Date | boolean>, table: string) {
+export function parse_query(
+	keys: Array<string>,
+	rows: Array<string | Date | boolean>,
+	table: string
+) {
 	let query = 'DELETE FROM ' + table + ' WHERE (';
 	keys.forEach(function callback(key, i) {
 		if (typeof rows[i] == 'string' && rows[i].includes('T')) {

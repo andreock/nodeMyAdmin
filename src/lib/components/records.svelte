@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Table } from 'src/app';
 	import { dialogs } from 'svelte-dialogs';
 	import ModifyDialog from './modify_dialog.svelte';
 	export let records: Table;

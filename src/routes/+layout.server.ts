@@ -9,7 +9,7 @@ export async function load({ params, cookies }) {
 	const ip = decrypt(cookies.get('ip'));
 	const type = decrypt(cookies.get('type'));
 
-	let databases: Array<string> = [];
+	const databases: Array<string> = [];
 
 	if (user == null || pass == null || ip == null || type == null) {
 		return {
@@ -17,18 +17,17 @@ export async function load({ params, cookies }) {
 			databases: databases
 		};
 	} else {
-
 		try {
-			if (type == "MySQL") {
+			if (type == 'MySQL') {
 				return {
 					success: true,
 					databases: await get_all_dbs_mysql(ip, user, pass)
 				};
-			}else if(type == "MSSQL"){
+			} else if (type == 'MSSQL') {
 				return {
 					success: true,
 					databases: await get_all_dbs_mssql(ip, user, pass)
-				}
+				};
 			}
 		} catch (error) {
 			console.error(error);

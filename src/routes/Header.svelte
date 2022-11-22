@@ -1,10 +1,10 @@
 <script lang="ts">
-	function logout(){
-		const form = document.getElementById("logout");
-		if(form instanceof HTMLFormElement)
-			form.submit();
+	function logout() {
+		const form = document.getElementById('logout');
+		if (form instanceof HTMLFormElement) form.submit();
 	}
 </script>
+
 <header>
 	<nav id="main-navbar" class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
 		<div class="container-fluid">

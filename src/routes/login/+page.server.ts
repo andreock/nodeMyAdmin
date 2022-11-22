@@ -8,12 +8,12 @@ export async function load({ params, cookies }) {
 	const pass = cookies.get('pass');
 	const user = cookies.get('user');
 	const ip = cookies.get('ip');
-	const type = cookies.get('type');	// We don't need to decrypt this because we check only if the informations is present
+	const type = cookies.get('type'); // We don't need to decrypt this because we check only if the informations is present
 	if (user == null || pass == null || ip == null || type == null) {
 		// we are already in login page
-    }else{
-        throw redirect(301, "/");
-    }
+	} else {
+		throw redirect(301, '/');
+	}
 }
 
 export const actions = {
@@ -24,33 +24,32 @@ export const actions = {
 		const pass = form_data.get('pass');
 		const type = form_data.get('type');
 
-		try {	
-			if(type == "MySql"){
+		try {
+			if (type == 'MySql') {
 				await mysql.createConnection({
 					host: ip,
 					user: user,
 					database: 'sys',
 					password: pass
 				});
-			}else if(type == "MSSQL"){
+			} else if (type == 'MSSQL') {
 				const sqlConfig = {
 					user: user,
 					password: pass,
-					database: "master",	// default database
+					database: 'master', // default database
 					server: ip,
 					pool: {
-					  max: 1,
-					  min: 0,
-					  idleTimeoutMillis: 30000
+						max: 1,
+						min: 0,
+						idleTimeoutMillis: 30000
 					},
 					options: {
-					  encrypt: true, // for azure
-					  trustServerCertificate: true // change to true for local dev / self-signed certs
+						encrypt: true, // for azure
+						trustServerCertificate: true // change to true for local dev / self-signed certs
 					}
-				  };
-				  await sql.connect(sqlConfig);
+				};
+				await sql.connect(sqlConfig);
 			}
-
 		} catch (error) {
 			console.error(error);
 			return { success: false };
@@ -109,6 +108,6 @@ export const actions = {
 			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
-		throw redirect(302, "/");
+		throw redirect(302, '/');
 	}
 };

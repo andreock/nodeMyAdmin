@@ -7,6 +7,7 @@ import type { Table } from 'sveltestrap';
 declare namespace App {}
 
 declare interface Table {
+	db: any;
 	records: any[]; // We don't know the data in table at this point
 	cols: Array<string>;
 	query: string;
@@ -59,7 +60,7 @@ declare interface Insert {
 	[row: string]: string | boolean;
 }
 
-declare interface Login_Response{
+declare interface Login_Response {
 	success: boolean;
 }
 

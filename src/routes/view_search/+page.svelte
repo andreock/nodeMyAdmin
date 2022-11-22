@@ -36,11 +36,4 @@
 		padding-left: 20em;
 		margin-top: 4em;
 	}
-	.code_container {
-		background-color: #858de5;
-		color: white;
-	}
-	.code_text {
-		font-size: 1.5em;
-	}
 </style>

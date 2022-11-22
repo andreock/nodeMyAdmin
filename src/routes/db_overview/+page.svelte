@@ -16,7 +16,7 @@
 	export let form: db_overview_form;
 
 	let databases: Array<string> = [],
-		show_records: boolean = false,
+		show_records = false,
 		selected = '',
 		struct = false,
 		delete_records = false;
@@ -35,7 +35,7 @@
 			}
 			selected = form.selected;
 			if (form.success) {
-				dialogs.alert('Query executed successfully').then(() => location.href = "/");
+				dialogs.alert('Query executed successfully').then(() => (location.href = '/'));
 			} else if (form.success != null) {
 				dialogs.alert('Error during the deletion of a column. Error: ' + form.error);
 			}

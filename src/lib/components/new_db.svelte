@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { DialogContent, dialogs, getClose } from 'svelte-dialogs';
+	import { DialogContent } from 'svelte-dialogs';
 </script>
 
 <DialogContent>

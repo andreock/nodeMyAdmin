@@ -16,22 +16,22 @@ export async function load({ cookies }) {
 
 	let version = ''; // version  of DB
 	if (user == null || pass == null || ip == null || type == null) {
-        throw redirect(301, "/login");  
+		throw redirect(301, '/login');
 	}
 
-	if(type == "MySQL"){
+	if (type == 'MySQL') {
 		try {
 			version = await get_mysql_version(ip, user, pass);
 		} catch (error) {
 			console.error(error);
 			return { success: false };
 		}
-	}else if(type == "MSSQL"){
+	} else if (type == 'MSSQL') {
 		try {
 			version = await get_mssql_version(ip, user, pass);
 		} catch (error) {
 			console.error(error);
-			return { success: false };			
+			return { success: false };
 		}
 	}
 
@@ -48,7 +48,6 @@ export async function load({ cookies }) {
 			version: version
 		}
 	};
-	
 }
 
 export const actions = {
@@ -65,9 +64,9 @@ export const actions = {
 		const type = decrypt(cookies.get('type')); // type of db
 
 		try {
-			if(type == "MySQL"){
+			if (type == 'MySQL') {
 				await create_db_mysql(ip, user, pass, form.get('db'));
-			}else if(type == "MSSQL"){
+			} else if (type == 'MSSQL') {
 				await create_db_mssql(ip, user, pass, form.get('db'));
 			}
 			return { success: true };
@@ -78,8 +77,8 @@ export const actions = {
 	logout: async ({ cookies }) => {
 		cookies.delete('user');
 		cookies.delete('pass');
-        cookies.delete('ip');
+		cookies.delete('ip');
 		cookies.delete('type');
-        throw redirect(302, "/login");
+		throw redirect(302, '/login');
 	}
 };
