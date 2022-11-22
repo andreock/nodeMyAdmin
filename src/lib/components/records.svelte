@@ -1,9 +1,9 @@
 <script lang="ts">
+	import type { Table } from 'src/app';
 	import { dialogs } from 'svelte-dialogs';
 	import ModifyDialog from './modify_dialog.svelte';
 	export let records: Table;
 	export let table: string;
-	export let db: string;
 </script>
 
 <div class="table_container">

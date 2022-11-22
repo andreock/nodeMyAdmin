@@ -11,10 +11,10 @@ const config = {
 		adapter: adapter({
 			// default options are shown
 			out: 'build',
-			precompress: true,
+			precompress: true
 		}),
 		csrf: {
-			checkOrigin: false,
+			checkOrigin: false
 		}
 	}
 };

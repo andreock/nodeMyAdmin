@@ -3,11 +3,21 @@ import { Buffer } from 'node:buffer';
 import dotenv from 'dotenv';
 dotenv.config();
 export function encrypt(text: string) {
-    const pass = crypto.createHash('md5').update(process.env.KEY).digest('hex');
+	let pass: string;
+	const key = process.env.KEY;
+	if(key != null)
+		pass = crypto.createHash('md5').update(key).digest('hex');
+	else
+		throw new Error("Invalid passphrase");
+
+	const iv = process.env.IV;
+	if(iv == null)
+		throw new Error("Invalid iv");
+
 	const cipher = crypto.createCipheriv(
 		'aes-256-cbc',
 		Buffer.from(pass),
-		Buffer.from(process.env.IV)
+		Buffer.from(iv)
 	);
 	let crypted = cipher.update(text, 'utf8', 'hex');
 	crypted += cipher.final('hex');
@@ -15,13 +25,23 @@ export function encrypt(text: string) {
 }
 
 export function decrypt(text: string) {
-    const pass = crypto.createHash('md5').update(process.env.KEY).digest('hex');
+	let pass: string;
+	const key = process.env.KEY;
+	if(key != null)
+		pass = crypto.createHash('md5').update(key).digest('hex');
+	else
+		throw new Error("Invalid passphrase");
+		
+	const iv = process.env.IV;
+	if(iv == null)
+		throw new Error("Invalid iv");
+
 	const decipher = crypto.createDecipheriv(
 		'aes-256-cbc',
 		Buffer.from(pass),
-		Buffer.from(process.env.IV)
+		Buffer.from(iv)
 	);
-    if(text == null)    return null;
+	if (text == null) return null;
 	let dec = decipher.update(text, 'hex', 'utf8');
 	dec += decipher.final('utf8');
 	return dec;

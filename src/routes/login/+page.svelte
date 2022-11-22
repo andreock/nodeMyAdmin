@@ -9,8 +9,7 @@
 	onMount(() => {
 		const header = document.getElementsByTagName('header');
 		header[0].style.display = 'none';
-		if(!form.success)
-			dialogs.alert("Wrong login data, please try again.");
+		if (!form.success) dialogs.alert('Wrong login data, please try again.');
 	});
 </script>
 
@@ -31,8 +30,8 @@
 			<div class="mb-3">
 				<label for="exampleInputPassword1" class="form-label">Type of server</label>
 				<select class="form-select" name="type">
-					<option selected>MySQL</option>
-					<option>MSSQL</option>
+					<option selected value="MySql">MySQL / MariaDB</option>
+					<option value="MSSQL">MSSQL</option>
 				</select>
 			</div>
 			<div class="mb-3">
@@ -64,10 +63,10 @@
 </section>
 
 <style>
-	@media only screen and (min-width: 1920px){
+	@media only screen and (min-width: 1920px) {
 		.login {
 			padding: 10em 40em 10em 40em;
-		}		
+		}
 	}
 	form {
 		background-color: white;

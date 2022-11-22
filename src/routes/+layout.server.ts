@@ -1,5 +1,6 @@
-import mysql from 'mysql2/promise';
 import { decrypt } from '$lib/crypto/aes';
+import { get_all_dbs_mysql } from '$lib/db/mysql/database';
+import { get_all_dbs_mssql } from '$lib/db/mssql/database';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
@@ -15,24 +16,21 @@ export async function load({ params, cookies }) {
 			success: true,
 			databases: databases
 		};
-	}else{
+	} else {
 		try {
-			const connection = await mysql.createConnection({
-				host: ip,
-				user: user,
-				database: 'sys',
-				password: pass
-			});
-
-			const [databases_raw] = await connection.query('SHOW DATABASES;'); // Get all databases
-			Array.from(databases_raw).forEach((db) => {
-				databases.push(db.Database);
-			});
-			connection.destroy();
-			return {
-				success: true,
-				databases: databases
-			};
+			
+			if (type == 'MySql') {
+				console.log("OK")
+				return {
+					success: true,
+					databases: await get_all_dbs_mysql(ip, user, pass)
+				};
+			} else if (type == 'MSSQL') {
+				return {
+					success: true,
+					databases: await get_all_dbs_mssql(ip, user, pass)
+				};
+			}
 		} catch (error) {
 			console.error(error);
 			return { success: false };

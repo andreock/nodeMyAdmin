@@ -38,16 +38,8 @@
 <!--Main layout-->
 <style>
 	@import 'bootstrap/dist/css/bootstrap.min.css';
-	.details {
-		margin-top: 100px;
-	}
 	.dbname {
 		padding-left: 5px;
-	}
-	@media (min-width: 991.98px) {
-		main {
-			padding-left: 240px;
-		}
 	}
 
 	/* Sidebar */

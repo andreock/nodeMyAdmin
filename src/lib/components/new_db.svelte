@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { DialogContent, dialogs, getClose } from 'svelte-dialogs';
+	import { DialogContent } from 'svelte-dialogs';
 </script>
 
 <DialogContent>
 	<svelte:fragment slot="body">
-		<form method="POST" action="?/create">
+		<form method="POST" action="/?/create">
 			<div class="mb-3">
 				<label for="exampleInputEmail1" class="form-label">Database name</label>
 				<input type="text" class="form-control" id="db" name="db" aria-describedby="emailHelp" />
