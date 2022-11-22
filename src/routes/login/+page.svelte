@@ -30,8 +30,8 @@
 			<div class="mb-3">
 				<label for="exampleInputPassword1" class="form-label">Type of server</label>
 				<select class="form-select" name="type">
-					<option selected>MySQL</option>
-					<option>MSSQL</option>
+					<option selected value="MySql">MySQL / MariaDB</option>
+					<option value="MSSQL">MSSQL</option>
 				</select>
 			</div>
 			<div class="mb-3">
