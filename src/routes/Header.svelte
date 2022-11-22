@@ -27,7 +27,7 @@
 					</li>
 					<li class="nav-item">
 						<form method="POST" action="/?/logout" id="logout">
-							<a class="nav-link active" aria-current="page" href="#0" on:click={logout}>Logout</a>
+							<a class="nav-link active" aria-current="page" href="#" on:click={logout}>Logout</a>
 						</form>
 					</li>
 				</ul>
