@@ -17,6 +17,9 @@ nodeMyAdmin want to replace phpMyAdmin and want to add support to several DB eng
 # TODO
 
 - Switch to connection pool
-- Add support for SQL Server
 
 Feel free to contribute opening pull requests or issue to fix/report problems.
+
+# Social
+
+Discord: https://discord.gg/kCSFqTScsz
