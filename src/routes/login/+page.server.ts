@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import mysql from 'mysql2/promise';
 import { encrypt } from '$lib/crypto/aes';
 import { login_mssql } from '$lib/db/mssql/login';
-import postgres from 'postgres'
+import postgres from 'postgres';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
@@ -48,14 +48,13 @@ export const actions = {
 				if(port == null) {
                     port = 5432;
                 }
-				console.log(ip)
 				postgres(`postgres://${user}:${pass}@${ip}:${port}/postgres`, {
 					host: ip,           
 					port: port,
 					database: 'postgres',            // default db
 					username: user,            
 					password: pass,        
-				})
+				});
 			}
 		} catch (error) {
 			console.error(error);
