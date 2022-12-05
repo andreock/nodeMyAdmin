@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import mysql from 'mysql2/promise';
 import { encrypt } from '$lib/crypto/aes';
-import sql from 'mssql';
+import { login_mssql } from '$lib/db/mssql/login';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
@@ -33,79 +33,39 @@ export const actions = {
 					password: pass
 				});
 			} else if (type == 'MSSQL') {
-				const sqlConfig = {
-					user: user,
-					password: pass,
-					database: 'master', // default database
-					server: ip,
-					pool: {
-						max: 1,
-						min: 0,
-						idleTimeoutMillis: 30000
-					},
-					options: {
-						encrypt: true, // for azure
-						trustServerCertificate: true // change to true for local dev / self-signed certs
-					}
-				};
-				await sql.connect(sqlConfig);
+				login_mssql(user, pass, ip);
 			}
 		} catch (error) {
 			console.error(error);
 			return { success: false };
 		}
 
-		// Save all in cookies, we need for other actions
 		await cookies.set('ip', encrypt(ip), {
-			// send cookie for every page
 			path: '/',
-			// server side only cookie so you can't use `document.cookie`
 			httpOnly: true,
-			// only requests from same site can send cookies
-			// https://developer.mozilla.org/en-US/docs/Glossary/CSRF
 			sameSite: 'strict',
-			// only sent over HTTPS in production
 			secure: process.env.NODE_ENV === 'production',
-			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
 		await cookies.set('user', encrypt(user), {
-			// send cookie for every page
 			path: '/',
-			// server side only cookie so you can't use `document.cookie`
 			httpOnly: true,
-			// only requests from same site can send cookies
-			// https://developer.mozilla.org/en-US/docs/Glossary/CSRF
 			sameSite: 'strict',
-			// only sent over HTTPS in production
 			secure: process.env.NODE_ENV === 'production',
-			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
 		await cookies.set('pass', encrypt(pass), {
-			// send cookie for every page
 			path: '/',
-			// server side only cookie so you can't use `document.cookie`
 			httpOnly: true,
-			// only requests from same site can send cookies
-			// https://developer.mozilla.org/en-US/docs/Glossary/CSRF
 			sameSite: 'strict',
-			// only sent over HTTPS in production
 			secure: process.env.NODE_ENV === 'production',
-			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
 		await cookies.set('type', encrypt(type), {
-			// send cookie for every page
 			path: '/',
-			// server side only cookie so you can't use `document.cookie`
 			httpOnly: true,
-			// only requests from same site can send cookies
-			// https://developer.mozilla.org/en-US/docs/Glossary/CSRF
 			sameSite: 'strict',
-			// only sent over HTTPS in production
 			secure: process.env.NODE_ENV === 'production',
-			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
 		throw redirect(302, '/');
