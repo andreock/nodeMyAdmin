@@ -2,6 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import mysql from 'mysql2/promise';
 import { encrypt } from '$lib/crypto/aes';
 import { login_mssql } from '$lib/db/mssql/login';
+import postgres from 'postgres'
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
@@ -19,21 +20,42 @@ export async function load({ params, cookies }) {
 export const actions = {
 	login: async ({ cookies, request }) => {
 		const form_data = await request.formData();
-		const ip = form_data.get('ip');
+		let ip = form_data.get('ip');
 		const user = form_data.get('user');
 		const pass = form_data.get('pass');
 		const type = form_data.get('type');
+		let port = ip.split(':')[1];
+		ip = ip.split(':')[0];
 
 		try {
 			if (type == 'MySql') {
+				if(port == null) {
+					port = 3306;	// default port
+				}
 				await mysql.createConnection({
 					host: ip,
 					user: user,
-					database: 'sys',
-					password: pass
+					database: 'sys',	// default db
+					password: pass, 
+					port: port
 				});
 			} else if (type == 'MSSQL') {
-				login_mssql(user, pass, ip);
+				if(port == null) {
+                    port = 1433;
+				}
+				login_mssql(user, pass, ip, port);
+			} else if (type == 'PostgreSQL') {
+				if(port == null) {
+                    port = 5432;
+                }
+				console.log(ip)
+				postgres(`postgres://${user}:${pass}@${ip}:${port}/postgres`, {	// We don't use formatted link, better use object
+					host: ip,           
+					port: port,
+					database: 'postgres',            // default db
+					username: user,            
+					password: pass,        
+				})
 			}
 		} catch (error) {
 			console.error(error);

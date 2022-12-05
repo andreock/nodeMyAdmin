@@ -23,7 +23,7 @@
 					class="form-control"
 					id="exampleInputEmail1"
 					aria-describedby="emailHelp"
-					placeholder="Ip of DB server"
+					placeholder="Ip of DB server, es. 127.0.0.1:5432, for default port you don't need to specify it"
 					name="ip"
 				/>
 			</div>
@@ -32,6 +32,7 @@
 				<select class="form-select" name="type">
 					<option selected value="MySql">MySQL / MariaDB</option>
 					<option value="MSSQL">MSSQL</option>
+					<option value="PostgreSQL">PostgreSQL</option>
 				</select>
 			</div>
 			<div class="mb-3">
