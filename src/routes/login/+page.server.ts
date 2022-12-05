@@ -49,7 +49,7 @@ export const actions = {
                     port = 5432;
                 }
 				console.log(ip)
-				postgres(`postgres://${user}:${pass}@${ip}:${port}/postgres`, {	// We don't use formatted link, better use object
+				postgres(`postgres://${user}:${pass}@${ip}:${port}/postgres`, {
 					host: ip,           
 					port: port,
 					database: 'postgres',            // default db
