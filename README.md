@@ -18,8 +18,13 @@ nodeMyAdmin want to replace phpMyAdmin and want to add support to several DB eng
 
 - Switch to connection pool
 
+# Installation
+
+See this guide:https://andrea055.github.io/nodeMyAdmin.github.io/download/
+ 
 Feel free to contribute opening pull requests or issue to fix/report problems.
 
 # Social
 
 Discord: https://discord.gg/kCSFqTScsz
+Website: https://andrea055.github.io/nodeMyAdmin.github.io/download/
