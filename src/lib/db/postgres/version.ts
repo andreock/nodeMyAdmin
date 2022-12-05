@@ -1,6 +1,6 @@
 import postgres from 'postgres';
 
-export async function get_all_dbs_postgres(ip: string, user: string, pass: string, port: string | undefined) {
+export async function get_postgres_version(ip: string, user: string, pass: string, port: string | undefined){
     if(port == null) throw new Error("Invalid port");
     const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/postgres`, {
         host: ip,
@@ -9,6 +9,6 @@ export async function get_all_dbs_postgres(ip: string, user: string, pass: strin
         username: user,
         password: pass,
     });
-    const databases = await sql`SELECT datname FROM pg_database;`;
-    return databases.map(db => db.datname);
+    const version = await sql`SELECT version();`;
+    return version[0].version;
 }
