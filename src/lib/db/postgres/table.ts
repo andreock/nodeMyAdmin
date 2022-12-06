@@ -1,17 +1,19 @@
 import postgres from 'postgres';
 
-export async function get_all_tables_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined){
+export async function get_all_tables_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string){
     if(port == null) throw new Error("Invalid port");
     try {
         const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
             host: ip,
             port: parseInt(port),
-            database: db,            // default db
+            database: db,           
             username: user,
             password: pass,
         });
-        const tables = await sql`SELECT * FROM information_schema.tables;`;
-        return tables.map(table => table.table_name);   
+        const tables = await sql`SELECT *
+        FROM pg_catalog.pg_tables WHERE tableowner LIKE ${db};`;
+        sql.end();
+        return tables.map(table => table.tablename);   
     } catch (error) {
         throw error;
     }
@@ -56,6 +58,7 @@ export async function delete_field_postgres(ip: string, user: string, pass: stri
             password: pass,
         });
         const tables = await sql`ALTER TABLE ${sql(table)} DROP COLUMN ${sql(col)}`;
+        sql.end();
         return tables.map(table => table.table_name);   
     } catch (error) {
         throw error;
@@ -72,7 +75,8 @@ export async function drop_table_postgres(ip: string, user: string, pass: string
             username: user,
             password: pass,
         });
-        await sql`DROP TABLE ${sql(table)}`;  
+        await sql`DROP TABLE ${sql(table)}`; 
+        sql.end(); 
     } catch (error) {
         throw error;
     }
@@ -89,6 +93,7 @@ export async function truncate_table_postgres(ip: string, user: string, pass: st
             password: pass,
         });
         await sql`TRUNCATE TABLE ${sql(table)}`;
+        sql.end();
     } catch (error) {
         throw error;
     }

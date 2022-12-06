@@ -10,5 +10,6 @@ export async function get_postgres_version(ip: string, user: string, pass: strin
         password: pass,
     });
     const version = await sql`SELECT version();`;
+    sql.end();
     return version[0].version;
 }

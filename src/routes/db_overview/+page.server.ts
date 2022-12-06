@@ -62,11 +62,13 @@ export async function load({ request, cookies }) {
 			db = 'sys';
 		else if (type == 'MSSQL' && db == null) db = 'master';
 		else if (type == 'PostgreSQL' && db == null) db = 'postgres';
+
 		if (type == 'MySql') {
 			return { db: db, tables: get_all_tables_mysql(ip, user, pass, db) };
 		} else if (type == 'MSSQL') {
 			return { db: db, tables: get_all_tables_mssql(ip, user, pass, db) };
 		} else if (type == 'PostgreSQL') {
+			console.log(db)
 			if(port == null) {
 				port = "5432";
 			}
