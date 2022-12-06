@@ -44,3 +44,20 @@ export async function struct_postgres(ip: string, user: string, pass: string, po
         throw error;  
     }
 }
+
+export async function delete_field_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string, col: string){
+    if(port == null) throw new Error("Invalid port");
+    try {
+        const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
+            host: ip,
+            port: parseInt(port),
+            database: db,            // default db
+            username: user,
+            password: pass,
+        });
+        const tables = await sql`ALTER TABLE ${sql(table)} DROP COLUMN ${sql(col)}`;
+        return tables.map(table => table.table_name);   
+    } catch (error) {
+        throw error;
+    }
+}

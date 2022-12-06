@@ -31,6 +31,7 @@ import {
 	update_record_mssql
 } from '$lib/db/mssql/record';
 import {
+	delete_field_postgres,
 	get_all_tables_postgres, struct_postgres
 } from '$lib/db/postgres/table';
 import { parse_query } from '$lib/db/helper/helper';
@@ -224,15 +225,22 @@ export const actions = {
 		const table = form_data.get('table');
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
-		const ip = decrypt(cookies.get('ip'));
-		const col = form_data.get('col');
+		let ip = decrypt(cookies.get('ip'));
 		const type = decrypt(cookies.get('type'));
+		let port = ip.split(':')[1];
+		ip = ip.split(':')[0];
+		const col = form_data.get('col');
 
 		try {
 			if (type == 'MySql') {
 				await delete_field_mysql(ip, user, pass, db, table, col);
 			} else if (type == 'MSSQL') {
 				await delete_field_mssql(ip, user, pass, db, table, col);
+			} else if (type == 'PostgreSQL') {
+				if(port == null) {
+                    port = "5432";
+                }
+				await delete_field_postgres(ip, user, pass, port, db, table, col);
 			}
 			console.log('OK');
 			return { success: true, type: 'delete' };
