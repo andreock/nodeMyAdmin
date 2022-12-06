@@ -36,6 +36,7 @@ import {
 import { parse_query } from '$lib/db/helper/helper';
 import { parse_query_update_mysql } from '$lib/db/mysql/helper';
 import { parse_query_update_mssql } from '$lib/db/mssql/helper';
+import { records_postgres } from '$lib/db/postgres/records';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ request, cookies }) {
@@ -127,8 +128,10 @@ export const actions = {
 		const table = form_data.get('table');
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
-		const ip = decrypt(cookies.get('ip'));
+		let ip = decrypt(cookies.get('ip'));
 		const type = decrypt(cookies.get('type'));
+		let port = ip.split(':')[1];
+		ip = ip.split(':')[0];
 
 		try {
 			if (type == 'MySql') {
@@ -149,6 +152,19 @@ export const actions = {
 				return {
 					records: result,
 					cols: Object.keys(result[0]), // We take the first element since is always the same
+					selected: table,
+					query: 'SELECT * FROM ' + table,
+					type: 'records',
+					db: db
+				};
+			}else if (type == 'PostgreSQL') {
+				if(port == null) {
+                    port = "5432";
+                }
+				let result = await records_postgres(ip, user, pass, port, db, table);
+				return {
+					records: result.rows,
+					cols: result.cols, // We take the first element since is always the same
 					selected: table,
 					query: 'SELECT * FROM ' + table,
 					type: 'records',

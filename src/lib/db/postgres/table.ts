@@ -19,7 +19,6 @@ export async function get_all_tables_postgres(ip: string, user: string, pass: st
 
 export async function struct_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string){
     try {
-        console.log(table)
         if(port == null) throw new Error("Invalid port");
         const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
             host: ip,
