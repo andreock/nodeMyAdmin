@@ -41,8 +41,11 @@ export function decrypt(text: string) {
 		Buffer.from(pass),
 		Buffer.from(iv)
 	);
-	if (text == null) return null;
-	let dec = decipher.update(text, 'hex', 'utf8');
-	dec += decipher.final('utf8');
-	return dec;
+	if (text != null) {
+		let dec = decipher.update(text, 'hex', 'utf8');
+		dec += decipher.final('utf8');
+		return dec;
+	}else{
+		return "Null value"	// This is just a marker because without this typescript trasform this function return in string | null
+	}
 }

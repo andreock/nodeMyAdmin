@@ -1,4 +1,3 @@
-import mysql from 'mysql2/promise';
 import { redirect } from '@sveltejs/kit';
 import { decrypt } from '$lib/crypto/aes';
 import {
@@ -31,6 +30,9 @@ import {
 	struct_mssql,
 	update_record_mssql
 } from '$lib/db/mssql/record';
+import {
+	get_all_tables_postgres, struct_postgres
+} from '$lib/db/postgres/table';
 import { parse_query } from '$lib/db/helper/helper';
 import { parse_query_update_mysql } from '$lib/db/mysql/helper';
 import { parse_query_update_mssql } from '$lib/db/mssql/helper';
@@ -39,8 +41,10 @@ import { parse_query_update_mssql } from '$lib/db/mssql/helper';
 export async function load({ request, cookies }) {
 	const pass = decrypt(cookies.get('pass'));
 	const user = decrypt(cookies.get('user'));
-	const ip = decrypt(cookies.get('ip'));
+	let ip = decrypt(cookies.get('ip'));
 	const type = decrypt(cookies.get('type'));
+	let port = ip?.split(':')[1];
+	ip = ip.split(':')[0];
 
 	if (user == null || pass == null || ip == null || type == null) {
 		throw redirect(301, '/login'); // Not logged in
@@ -51,15 +55,19 @@ export async function load({ request, cookies }) {
 		const params = url.split('?')[1];
 		let db = params.split('=')[1];
 
-		if (db == null && type == 'MySql')
-			// if for some reason the db is null we use the default db
+		if (db == null && type == 'MySql')			// if for some reason the db is null we use the default db
 			db = 'sys';
 		else if (type == 'MSSQL' && db == null) db = 'master';
-
+		else if (type == 'PostgreSQL' && db == null) db = 'postgres';
 		if (type == 'MySql') {
 			return { db: db, tables: get_all_tables_mysql(ip, user, pass, db) };
 		} else if (type == 'MSSQL') {
 			return { db: db, tables: get_all_tables_mssql(ip, user, pass, db) };
+		} else if (type == 'PostgreSQL') {
+			if(port == null) {
+				port = "5432";
+			}
+			return { db: db, tables: get_all_tables_postgres(ip, user, pass, port, db) };
 		}
 	} catch (error) {
 		console.error(error);
@@ -100,6 +108,12 @@ export const actions = {
 							type: row['Type']
 						};
 					})
+				};
+			} else if (type == 'PostgreSQL') {
+				const rows = await struct_postgres(ip, user, pass, db, table);
+				return {
+					success: true,
+					records: []
 				};
 			}
 		} catch (error) {
@@ -152,8 +166,10 @@ export const actions = {
 		const table = form_data.get('table');
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
-		const ip = decrypt(cookies.get('ip'));
+		let ip = decrypt(cookies.get('ip'));
 		const type = decrypt(cookies.get('type'));
+		let port = ip.split(':')[1];
+		ip = ip.split(':')[0];
 
 		try {
 			if (type == 'MySql') {
@@ -170,10 +186,20 @@ export const actions = {
 					type: 'struct',
 					db: db
 				};
+			}else if (type == 'PostgreSQL') {
+				if(port == null) {
+                    port = "5432";
+                }
+				return {
+					cols: await struct_postgres(ip, user, pass, port, db, table),
+					selected: table,
+					type: 'struct',
+					db: db
+				};
 			}
 		} catch (error) {
 			console.error(error);
-			return '';
+			return { success: false, error: error};
 		}
 	},
 	delete: async ({ cookies, request }) => {
