@@ -61,3 +61,35 @@ export async function delete_field_postgres(ip: string, user: string, pass: stri
         throw error;
     }
 }
+
+export async function drop_table_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string){
+    if(port == null) throw new Error("Invalid port");
+    try {
+        const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
+            host: ip,
+            port: parseInt(port),
+            database: db,            // default db
+            username: user,
+            password: pass,
+        });
+        await sql`DROP TABLE ${sql(table)}`;  
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function truncate_table_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string){
+    if(port == null) throw new Error("Invalid port");
+    try {
+        const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
+            host: ip,
+            port: parseInt(port),
+            database: db,            // default db
+            username: user,
+            password: pass,
+        });
+        await sql`TRUNCATE TABLE ${sql(table)}`;
+    } catch (error) {
+        throw error;
+    }
+}

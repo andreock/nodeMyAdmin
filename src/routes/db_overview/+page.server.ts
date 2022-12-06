@@ -32,7 +32,8 @@ import {
 } from '$lib/db/mssql/record';
 import {
 	delete_field_postgres,
-	get_all_tables_postgres, struct_postgres
+	drop_table_postgres,
+	get_all_tables_postgres, struct_postgres, truncate_table_postgres
 } from '$lib/db/postgres/table';
 import { parse_query } from '$lib/db/helper/helper';
 import { parse_query_update_mysql } from '$lib/db/mysql/helper';
@@ -242,7 +243,6 @@ export const actions = {
                 }
 				await delete_field_postgres(ip, user, pass, port, db, table, col);
 			}
-			console.log('OK');
 			return { success: true, type: 'delete' };
 		} catch (error) {
 			console.error(error);
@@ -341,7 +341,9 @@ export const actions = {
 	truncate: async ({ cookies, request }) => {
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
-		const ip = decrypt(cookies.get('ip'));
+		let ip = decrypt(cookies.get('ip'));
+		let port = ip.split(':')[1];
+		ip = ip.split(':')[0];
 		const form = await request.formData();
 		const db = form.get('db');
 		const table = form.get('table');
@@ -352,6 +354,11 @@ export const actions = {
 				await truncate_table_mysql(ip, user, pass, db, table);
 			} else if (type == 'MSSQL') {
 				await truncate_table_mssql(ip, user, pass, db, table);
+			}else if (type == 'PostgreSQL') {
+				if(port == null) {
+                    port = "5432";
+                }
+				await truncate_table_postgres(ip, user, pass, port, db, table);
 			}
 			return { success: true, type: 'truncate' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -368,7 +375,9 @@ export const actions = {
 	drop: async ({ cookies, request }) => {
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
-		const ip = decrypt(cookies.get('ip'));
+		let ip = decrypt(cookies.get('ip'));
+		let port = ip.split(':')[1];
+		ip = ip.split(':')[0];		
 		const form = await request.formData();
 		const db = form.get('db');
 		const table = form.get('table');
@@ -379,6 +388,11 @@ export const actions = {
 				await drop_table_mysql(ip, user, pass, db, table);
 			} else if (type == 'MSSQL') {
 				await drop_table_mssql(ip, user, pass, db, table);
+			}else if (type == 'PostgreSQL') {
+				if(port == null) {
+                    port = "5432";
+                }
+				await drop_table_postgres(ip, user, pass, port, db, table);
 			}
 			return { success: true, type: 'drop' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
