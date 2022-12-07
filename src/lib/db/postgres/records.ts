@@ -12,10 +12,16 @@ export async function records_postgres(ip: string, user: string, pass: string, p
         });
         const tables = await sql`SELECT * FROM ${sql(table)};`;
         sql.end();
-        return {
-            cols: Object.keys(tables[0]),
-            rows: Object.values(tables)
-        } 
+        if(tables.length != 0)
+            return {
+                cols: Object.keys(tables[0]),
+                rows: Object.values(tables)
+            }
+        else
+            return {
+                cols: [],
+                rows: []
+            }
     } catch (error) {
         throw error;
     }

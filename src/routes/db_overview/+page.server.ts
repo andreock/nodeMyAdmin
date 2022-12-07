@@ -31,6 +31,7 @@ import {
 	update_record_mssql
 } from '$lib/db/mssql/record';
 import {
+	create_table_postgres,
 	delete_field_postgres,
 	drop_table_postgres,
 	get_all_tables_postgres, struct_postgres, truncate_table_postgres
@@ -68,7 +69,7 @@ export async function load({ request, cookies }) {
 		} else if (type == 'MSSQL') {
 			return { db: db, tables: get_all_tables_mssql(ip, user, pass, db) };
 		} else if (type == 'PostgreSQL') {
-			if(port == null) {
+			if (port == null) {
 				port = "5432";
 			}
 			return { db: db, tables: await get_all_tables_postgres(ip, user, pass, port, db) };
@@ -116,7 +117,7 @@ export const actions = {
 					})
 				};
 			} else if (type == 'PostgreSQL') {
-				if(port == null) {
+				if (port == null) {
 					port = "5432";
 				}
 				const rows = await struct_postgres(ip, user, pass, port, db, table);
@@ -125,7 +126,7 @@ export const actions = {
 					records: rows.map((row) => {
 						return {
 							name: row['Field'],
-                            type: row['Type']
+							type: row['Type']
 						};
 					})
 				};
@@ -170,10 +171,10 @@ export const actions = {
 					type: 'records',
 					db: db
 				};
-			}else if (type == 'PostgreSQL') {
-				if(port == null) {
-                    port = "5432";
-                }
+			} else if (type == 'PostgreSQL') {
+				if (port == null) {
+					port = "5432";
+				}
 				let result = await records_postgres(ip, user, pass, port, db, table);
 				return {
 					records: result.rows,
@@ -215,10 +216,10 @@ export const actions = {
 					type: 'struct',
 					db: db
 				};
-			}else if (type == 'PostgreSQL') {
-				if(port == null) {
-                    port = "5432";
-                }
+			} else if (type == 'PostgreSQL') {
+				if (port == null) {
+					port = "5432";
+				}
 				return {
 					cols: await struct_postgres(ip, user, pass, port, db, table),
 					selected: table,
@@ -228,7 +229,7 @@ export const actions = {
 			}
 		} catch (error) {
 			console.error(error);
-			return { success: false, error: error};
+			return { success: false, error: error };
 		}
 	},
 	delete: async ({ cookies, request }) => {
@@ -249,9 +250,9 @@ export const actions = {
 			} else if (type == 'MSSQL') {
 				await delete_field_mssql(ip, user, pass, db, table, col);
 			} else if (type == 'PostgreSQL') {
-				if(port == null) {
-                    port = "5432";
-                }
+				if (port == null) {
+					port = "5432";
+				}
 				await delete_field_postgres(ip, user, pass, port, db, table, col);
 			}
 			return { success: true, type: 'delete' };
@@ -284,9 +285,9 @@ export const actions = {
 			} else if (type == 'MSSQL') {
 				await delete_record_mssql(ip, user, pass, db, table, query);
 			} else if (type == 'PostgreSQL') {
-				if(port == null) {
-                    port = "5432";
-                }
+				if (port == null) {
+					port = "5432";
+				}
 				await delete_record_postgres(ip, user, pass, port, db, query)
 			}
 			return { success: true, type: 'delete' };
@@ -372,10 +373,10 @@ export const actions = {
 				await truncate_table_mysql(ip, user, pass, db, table);
 			} else if (type == 'MSSQL') {
 				await truncate_table_mssql(ip, user, pass, db, table);
-			}else if (type == 'PostgreSQL') {
-				if(port == null) {
-                    port = "5432";
-                }
+			} else if (type == 'PostgreSQL') {
+				if (port == null) {
+					port = "5432";
+				}
 				await truncate_table_postgres(ip, user, pass, port, db, table);
 			}
 			return { success: true, type: 'truncate' };
@@ -395,7 +396,7 @@ export const actions = {
 		const user = decrypt(cookies.get('user'));
 		let ip = decrypt(cookies.get('ip'));
 		let port = ip.split(':')[1];
-		ip = ip.split(':')[0];		
+		ip = ip.split(':')[0];
 		const form = await request.formData();
 		const db = form.get('db');
 		const table = form.get('table');
@@ -406,10 +407,10 @@ export const actions = {
 				await drop_table_mysql(ip, user, pass, db, table);
 			} else if (type == 'MSSQL') {
 				await drop_table_mssql(ip, user, pass, db, table);
-			}else if (type == 'PostgreSQL') {
-				if(port == null) {
-                    port = "5432";
-                }
+			} else if (type == 'PostgreSQL') {
+				if (port == null) {
+					port = "5432";
+				}
 				await drop_table_postgres(ip, user, pass, port, db, table);
 			}
 			return { success: true, type: 'drop' };
@@ -457,16 +458,25 @@ export const actions = {
 		const form = await request.formData();
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
-		const ip = decrypt(cookies.get('ip'));
+		let ip = decrypt(cookies.get('ip'));
+		let port = ip.split(':')[1];
+		ip = ip.split(':')[0];
 		const fields = JSON.parse(form.get('fields'));
 		const type = decrypt(cookies.get('type'));
+		const db = form.get('db');
+		const table = form.get('table');
 
 		try {
 			if (type == 'MySql')
-				create_table_mysql(ip, user, pass, form.get('db'), form.get('table'), fields);
+				create_table_mysql(ip, user, pass, db, table, fields);
 			else if (type == 'MSSQL')
-				create_table_mssql(ip, user, pass, form.get('db'), form.get('table'), fields);
-
+				create_table_mssql(ip, user, pass, db, table, fields);
+			else if (type == 'PostgreSQL') {
+				if (port == null) {
+					port = "5432";
+				}
+				create_table_postgres(ip, user, pass, port, db, table, fields);
+			}
 			return { success: true, type: 'create' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {

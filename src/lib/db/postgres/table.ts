@@ -1,8 +1,8 @@
 import postgres from 'postgres';
 
 export async function get_all_tables_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string){
-    if(port == null) throw new Error("Invalid port");
     try {
+        if(port == null) throw new Error("Invalid port");
         const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
             host: ip,
             port: parseInt(port),
@@ -10,10 +10,16 @@ export async function get_all_tables_postgres(ip: string, user: string, pass: st
             username: user,
             password: pass,
         });
-        const tables = await sql`SELECT *
-        FROM pg_catalog.pg_tables WHERE tableowner LIKE ${db};`;
-        sql.end();
-        return tables.map(table => table.tablename);   
+        if(db == "postgres") {  // Postgres db need this command to work for some strange reason
+                const tables = await sql`SELECT *
+            FROM pg_catalog.pg_tables WHERE tableowner LIKE ${db};`;
+            sql.end();
+            return tables.map(table => table.tablename);          
+        }else{
+            const tables = await sql`select * from pg_catalog.pg_tables where schemaname='public';`;
+            sql.end();
+            return tables.map(table => table.tablename); 
+        }
     } catch (error) {
         throw error;
     }
@@ -29,27 +35,33 @@ export async function struct_postgres(ip: string, user: string, pass: string, po
             username: user,
             password: pass,
         });
-        const columns = await sql`SELECT * FROM  ${ sql(table) }
-                                    LIMIT 1`;    // Don't use information_schema because might change, get only first row with all rowsS
+        const columns = await sql`SELECT attname, format_type(atttypid, atttypmod) AS type, attlen, attnotnull, atthasdef
+        FROM   pg_attribute
+        WHERE  attrelid = ${table}::regclass
+        AND    attnum > 0
+        AND    NOT attisdropped
+        ORDER  BY attnum;
+        `;    // Don't use information_schema because might change, get only first row with all rowsS
+        console.log(columns);
         sql.end();
-        return Object.keys(columns[0]).map(function(column, i) {
+        return columns.map(column => {
             return {
-                Field: column,
-				Type: typeof(Object.values(columns[0])[i]) + " - may not be accurate",
-				Key: '', // We don't have this property in this query in PostgreSQL
-				Null: "", // We don't have this property in this query in PostgreSQL
-				Default: '', // We don't have this property in this query in PostgreSQL
-				Extra: '' // We don't have this property in this query in PostgreSQL
-            };
-        }); // Return columns of the first element 
+                Field: column.attname,
+				Type: column.type,
+				Key: '', // We don't have this property in this query in MSSQL
+				Null: !column.attnotnull,
+				Default: column.atthasdef ? "Has a default value, but we don't know it in Postgres" : '',
+				Extra: 'Length: ' + column.attlen
+            }
+        });
     } catch (error) {
         throw error;  
     }
 }
 
 export async function delete_field_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string, col: string){
-    if(port == null) throw new Error("Invalid port");
     try {
+        if(port == null) throw new Error("Invalid port");
         const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
             host: ip,
             port: parseInt(port),
@@ -66,8 +78,8 @@ export async function delete_field_postgres(ip: string, user: string, pass: stri
 }
 
 export async function drop_table_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string){
-    if(port == null) throw new Error("Invalid port");
     try {
+        if(port == null) throw new Error("Invalid port");
         const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
             host: ip,
             port: parseInt(port),
@@ -83,8 +95,8 @@ export async function drop_table_postgres(ip: string, user: string, pass: string
 }
 
 export async function truncate_table_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string){
-    if(port == null) throw new Error("Invalid port");
     try {
+        if(port == null) throw new Error("Invalid port");
         const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
             host: ip,
             port: parseInt(port),
@@ -93,6 +105,27 @@ export async function truncate_table_postgres(ip: string, user: string, pass: st
             password: pass,
         });
         await sql`TRUNCATE TABLE ${sql(table)}`;
+        sql.end();
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function create_table_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string, fields: Array<string>){
+    try {
+        if(port == null) throw new Error("Invalid port");
+        const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
+            host: ip,
+            port: parseInt(port),
+            database: db,            // default db
+            username: user,
+            password: pass,
+        });
+        let query = 'CREATE TABLE IF NOT EXISTS ' + table + ' (';
+		fields.forEach((field) => (query += field + ','));
+		query = query.slice(0, -1) + '';
+		query += ')';
+        await sql`${sql(query)}`;
         sql.end();
     } catch (error) {
         throw error;
