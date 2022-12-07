@@ -38,7 +38,7 @@ import {
 import { parse_query } from '$lib/db/helper/helper';
 import { parse_query_update_mysql } from '$lib/db/mysql/helper';
 import { parse_query_update_mssql } from '$lib/db/mssql/helper';
-import { records_postgres } from '$lib/db/postgres/records';
+import { delete_record_postgres, records_postgres } from '$lib/db/postgres/records';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ request, cookies }) {
@@ -68,11 +68,10 @@ export async function load({ request, cookies }) {
 		} else if (type == 'MSSQL') {
 			return { db: db, tables: get_all_tables_mssql(ip, user, pass, db) };
 		} else if (type == 'PostgreSQL') {
-			console.log(db)
 			if(port == null) {
 				port = "5432";
 			}
-			return { db: db, tables: get_all_tables_postgres(ip, user, pass, port, db) };
+			return { db: db, tables: await get_all_tables_postgres(ip, user, pass, port, db) };
 		}
 	} catch (error) {
 		console.error(error);
@@ -87,8 +86,10 @@ export const actions = {
 		const table = form_data.get('table');
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
-		const ip = decrypt(cookies.get('ip'));
+		let ip = decrypt(cookies.get('ip'));
 		const type = decrypt(cookies.get('type'));
+		let port = ip?.split(':')[1];
+		ip = ip.split(':')[0];
 
 		try {
 			if (type == 'MySql') {
@@ -115,10 +116,18 @@ export const actions = {
 					})
 				};
 			} else if (type == 'PostgreSQL') {
-				const rows = await struct_postgres(ip, user, pass, db, table);
+				if(port == null) {
+					port = "5432";
+				}
+				const rows = await struct_postgres(ip, user, pass, port, db, table);
 				return {
 					success: true,
-					records: []
+					records: rows.map((row) => {
+						return {
+							name: row['Field'],
+                            type: row['Type']
+						};
+					})
 				};
 			}
 		} catch (error) {
@@ -258,9 +267,11 @@ export const actions = {
 		const index = form_data.get('index');
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
-		const ip = decrypt(cookies.get('ip'));
-		const db = form_data.get('db');
+		let ip = decrypt(cookies.get('ip'));
 		const type = decrypt(cookies.get('type'));
+		let port = ip.split(':')[1];
+		ip = ip.split(':')[0];
+		const db = form_data.get('db');
 
 		const keys = Object.keys(values_raw[index]);
 		const rows = Object.values(values_raw[index]);
@@ -272,6 +283,11 @@ export const actions = {
 				await delete_record_mysql(ip, user, pass, db, query);
 			} else if (type == 'MSSQL') {
 				await delete_record_mssql(ip, user, pass, db, table, query);
+			} else if (type == 'PostgreSQL') {
+				if(port == null) {
+                    port = "5432";
+                }
+				await delete_record_postgres(ip, user, pass, port, db, query)
 			}
 			return { success: true, type: 'delete' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any

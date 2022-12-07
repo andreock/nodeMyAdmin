@@ -67,7 +67,7 @@
 	<h1 slot="header">Add a record in {table}</h1>
 	<svelte:fragment slot="body">
 		<div class="mb-3">
-			{#each rows as row, i}
+			{#each rows as row}
 				<label for={row.name} class="form-label">{row.name + ' - Type: ' + row.type}</label>
 				{#if row.type == 253 || row.type == 167}
 					<!--Is a string-->
@@ -85,6 +85,8 @@
 					</div>
 				{:else if row.type == 56 || row.type == 2}
 					<input type="number" id={row.name} class="form-control" />
+				{:else}
+					<input type="text" id={row.name} class="form-control" /> <!-- if we don't know type, use a simple string -->
 				{/if}
 				<br />
 			{/each}
