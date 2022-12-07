@@ -43,3 +43,20 @@ export async function delete_record_postgres(ip: string, user: string, pass: str
         throw error;
     }
 }
+
+export async function add_record_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string, records: string) {
+    if(port == null) throw new Error("Invalid port");
+    try {
+        const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
+            host: ip,
+            port: parseInt(port),
+            database: db,            // default db
+            username: user,
+            password: pass,
+        });
+        await sql`insert into ${sql(table)} ${sql(records)}`;
+        sql.end();
+    } catch (error) {
+        throw error;
+    }
+}

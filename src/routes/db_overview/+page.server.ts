@@ -39,7 +39,7 @@ import {
 import { parse_query } from '$lib/db/helper/helper';
 import { parse_query_update_mysql } from '$lib/db/mysql/helper';
 import { parse_query_update_mssql } from '$lib/db/mssql/helper';
-import { delete_record_postgres, records_postgres } from '$lib/db/postgres/records';
+import { add_record_postgres, delete_record_postgres, records_postgres } from '$lib/db/postgres/records';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ request, cookies }) {
@@ -126,7 +126,7 @@ export const actions = {
 					records: rows.map((row) => {
 						return {
 							name: row['Field'],
-							type: row['Type']
+							type: row['type_id']
 						};
 					})
 				};
@@ -337,7 +337,9 @@ export const actions = {
 	add: async ({ cookies, request }) => {
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
-		const ip = decrypt(cookies.get('ip'));
+		let ip = decrypt(cookies.get('ip'));
+		let port = ip.split(':')[1];
+		ip = ip.split(':')[0];
 		const form = await request.formData();
 		const db = form.get('db');
 		const table = form.get('table');
@@ -349,6 +351,11 @@ export const actions = {
 				await add_record_mysql(ip, user, pass, db, table, records);
 			} else if (type == 'MSSQL') {
 				await add_record_mssql(ip, user, pass, db, table, JSON.parse(records));
+			}else if (type == 'PostgreSQL') {
+				if (port == null) {
+					port = "5432";
+				}
+				await add_record_postgres(ip, user, pass, port, db, table, JSON.parse(records));
 			}
 			return { success: true, type: 'add' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
