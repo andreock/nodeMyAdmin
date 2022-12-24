@@ -1,12 +1,14 @@
 import mysql from 'mysql2/promise';
 
-export async function get_mysql_version(ip: string, user: string, pass: string): Promise<string> {
+export async function get_mysql_version(ip: string, user: string, pass: string, port: string): Promise<string> {
 	try {
+		if(port == null) port = "3306";
 		const connection = await mysql.createConnection({
 			host: ip,
 			user: user,
 			database: 'sys',
-			password: pass
+			password: pass,
+			port: parseInt(port)
 		});
 
 		// get version

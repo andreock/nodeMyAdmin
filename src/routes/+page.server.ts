@@ -25,7 +25,10 @@ export async function load({ cookies }) {
 	
 	try {
 		if (type == 'MySql') {
-			version = await get_mysql_version(ip, user, pass);
+			if (port == null) {
+				port = "3306";
+			}
+			version = await get_mysql_version(ip, user, pass, port);
 
 		} else if (type == 'MSSQL') {
 			version = await get_mssql_version(ip, user, pass);
@@ -70,7 +73,10 @@ export const actions = {
 
 		try {
 			if (type == 'MySql') {
-				await create_db_mysql(ip, user, pass, form.get('db'));
+				if (port == null) {
+					port = "3306";
+				}
+				await create_db_mysql(ip, user, pass, form.get('db'), port);
 			} else if (type == 'MSSQL') {
 				await create_db_mssql(ip, user, pass, form.get('db'));
 			} else if (type == 'PostgreSQL') {

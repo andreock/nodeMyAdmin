@@ -23,9 +23,12 @@ export async function load({ params, cookies }) {
 		try {
 			
 			if (type == 'MySql') {
+				if (port == null) {
+					port = "3306";
+				}
 				return {
 					success: true,
-					databases: await get_all_dbs_mysql(ip, user, pass)
+					databases: await get_all_dbs_mysql(ip, user, pass, port)
 				};
 			} else if (type == 'MSSQL') {
 				return {
