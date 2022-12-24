@@ -173,7 +173,6 @@ export async function create_table_postgres(
 		let query = '';
 		fields.forEach((field) => (query += field + ','));
 		query = query.slice(0, -1) + '';
-		console.log(query);
 		await sql`CREATE TABLE IF NOT EXISTS ${sql(table)} ( ${sql(query)} )`;
 		sql.end();
 	} catch (error) {

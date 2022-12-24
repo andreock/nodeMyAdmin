@@ -102,7 +102,6 @@ export const actions = {
 		try {
 			if (type == 'MySql') {
 				const rows = await records_mysql(ip, user, pass, db, table, port);
-				console.log(rows);
 				return {
 					success: true,
 					records: rows.cols_raw.map((row) => {

@@ -148,7 +148,6 @@ export async function search_in_table_mysql(
 		const rows = Object.values(records);
 		let query = parse_query(keys, rows, table);
 		query = query.replace('DELETE FROM', 'SELECT * FROM');
-		console.log(query);
 		const connection = await mysql.createConnection({
 			host: ip,
 			user: user,

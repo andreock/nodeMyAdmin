@@ -39,7 +39,6 @@
 		fetch('?/create', requestOptions)
 			.then((response) => response.json())
 			.then(async (result) => {
-				console.log(result);
 				if (result.data.success) {
 					dialogs.alert('Table created successfully').then(() => location.reload());
 				} else {

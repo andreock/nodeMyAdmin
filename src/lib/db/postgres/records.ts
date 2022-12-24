@@ -116,7 +116,6 @@ export async function update_record_postgres(
 		});
 		const query_where = parse_query_postgres(old_keys, old_rows).replace('where ', '');
 		const result = await sql`update ${sql(table)} set ${sql(new_record)} where ${query_where}`;
-		console.log(result);
 		sql.end();
 	} catch (error) {
 		throw error;

@@ -23,13 +23,11 @@ export function parse_query(
 					query += `${key} = '${rows[i]}' AND `; // The boolean must be written in query without quotes, with quotes became a string and broke the WHERE clause
 				else query += `${key} = ${rows[i]} AND `;
 			} else {
-				console.log('OKOKOK');
 				if (typeof rows[i] != 'boolean')
 					query += `${key} = '${rows[i]}' )`; // The last where don't need AND
 				else query += `${key} = ${rows[i]} )`; // The last where don't need AND
 			}
 		}
 	});
-	console.log(query);
 	return query;
 }
