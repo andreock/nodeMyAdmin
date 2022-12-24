@@ -33,7 +33,7 @@ export async function load({ params, cookies }) {
 			} else if (type == 'MSSQL') {
 				return {
 					success: true,
-					databases: await get_all_dbs_mssql(ip, user, pass)
+					databases: await get_all_dbs_mssql(ip, user, pass, port)
 				};
 			}else if (type == 'PostgreSQL') {
 				if(port == null) port = "5432";

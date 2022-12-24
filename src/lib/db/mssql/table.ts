@@ -5,13 +5,16 @@ export async function get_all_tables_mssql(
 	ip: string,
 	user: string,
 	password: string,
-	db: string
+	db: string,
+	port: string
 ): Promise<string> {
+	if(port == null) port = "1433";
 	const sqlConfig = {
 		user: user,
 		password: password,
 		database: db, // this is the default database
 		server: ip,
+		port: port,
 		pool: {
 			max: 1,
 			min: 0,
@@ -41,13 +44,16 @@ export async function create_table_mssql(
 	password: string,
 	db: string,
 	table: string,
-	fields: Array<string>
+	fields: Array<string>,
+	port: string
 ) {
+	if(port == null) port = "1433";
 	const sqlConfig = {
 		user: user,
 		password: password,
 		database: db, // this is the default database
 		server: ip,
+		port: port,
 		pool: {
 			max: 1,
 			min: 0,
@@ -76,13 +82,16 @@ export async function drop_table_mssql(
 	user: string,
 	password: string,
 	db: string,
-	table: string
+	table: string,
+	port: string
 ) {
+	if(port == null) port = "1433";
 	const sqlConfig = {
 		user: user,
 		password: password,
 		database: db, // this is the default database
 		server: ip,
+		port: port,
 		pool: {
 			max: 1,
 			min: 0,
@@ -107,13 +116,16 @@ export async function truncate_table_mssql(
 	user: string,
 	password: string,
 	db: string,
-	table: string
+	table: string,
+	port: string
 ) {
+	if(port == null) port = "1433";
 	const sqlConfig = {
 		user: user,
 		password: password,
 		database: db, // this is the default database
 		server: ip,
+		port: port,
 		pool: {
 			max: 1,
 			min: 0,
@@ -139,13 +151,16 @@ export async function delete_field_mssql(
 	password: string,
 	db: string,
 	table: string,
-	col: string
+	col: string,
+	port: string
 ) {
+	if(port == null) port = "1433";
 	const sqlConfig = {
 		user: user,
 		password: password,
 		database: db, // this is the default database
 		server: ip,
+		port: port,
 		pool: {
 			max: 1,
 			min: 0,
@@ -171,9 +186,11 @@ export async function search_in_table_mssql(
 	password: string,
 	db: string,
 	table: string,
-	records: object
+	records: object,
+	port: string
 ) {
 	try {
+		if(port == null) port = "1433";
 		const keys = Object.keys(records);
 		const rows = Object.values(records);
 		let query = parse_query(keys, rows, table);
@@ -183,6 +200,7 @@ export async function search_in_table_mssql(
 			password: password,
 			database: db, // this is the default database
 			server: ip,
+			port: port,
 			pool: {
 				max: 1,
 				min: 0,
@@ -207,13 +225,16 @@ export async function struct_mssql(
 	user: string,
 	password: string,
 	db: string,
-	table: string
+	table: string,
+	port: string
 ) {
+	if(port == null) port = "1433";
 	const sqlConfig = {
 		user: user,
 		password: password,
 		database: db, // this is the default database
 		server: ip,
+		port: port,
 		pool: {
 			max: 1,
 			min: 0,

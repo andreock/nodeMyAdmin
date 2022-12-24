@@ -1,5 +1,4 @@
 import process from 'process';
-import mysql from 'mysql2/promise';
 import { redirect } from '@sveltejs/kit';
 import { decrypt } from '$lib/crypto/aes';
 import { get_mysql_version } from '$lib/db/mysql/version';
@@ -31,7 +30,7 @@ export async function load({ cookies }) {
 			version = await get_mysql_version(ip, user, pass, port);
 
 		} else if (type == 'MSSQL') {
-			version = await get_mssql_version(ip, user, pass);
+			version = await get_mssql_version(ip, user, pass, port);
 		}else if (type == 'PostgreSQL') {
 			if(port == null) port = "5432";
 			version = await get_postgres_version(ip, user, pass, port);
@@ -78,7 +77,7 @@ export const actions = {
 				}
 				await create_db_mysql(ip, user, pass, form.get('db'), port);
 			} else if (type == 'MSSQL') {
-				await create_db_mssql(ip, user, pass, form.get('db'));
+				await create_db_mssql(ip, user, pass, form.get('db'), port);
 			} else if (type == 'PostgreSQL') {
 				if(port == null) {
 					port = "5432";

@@ -5,13 +5,16 @@ export async function records_mssql(
 	user: string,
 	password: string,
 	db: string,
-	table: string
+	table: string,
+	port: string
 ) {
+	if(port == null) port = "1433";
 	const sqlConfig = {
 		user: user,
 		password: password,
 		database: db, // this is the default database
 		server: ip,
+		port: port,
 		pool: {
 			max: 1,
 			min: 0,
@@ -38,13 +41,16 @@ export async function add_record_mssql(
 	password: string,
 	db: string,
 	table: string,
-	records: object
+	records: object,
+	port: string
 ) {
+	if(port == null) port = "1433";
 	const sqlConfig = {
 		user: user,
 		password: password,
 		database: db, // this is the default database
 		server: ip,
+		port: port,
 		pool: {
 			max: 1,
 			min: 0,
@@ -81,13 +87,16 @@ export async function delete_record_mssql(
 	password: string,
 	db: string,
 	table: string,
-	query: string
+	query: string,
+	port: string
 ) {
+	if(port == null) port = "1433";
 	const sqlConfig = {
 		user: user,
 		password: password,
 		database: db, // this is the default database
 		server: ip,
+		port: port,
 		pool: {
 			max: 1,
 			min: 0,
@@ -113,13 +122,16 @@ export async function update_record_mssql(
 	password: string,
 	db: string,
 	table: string,
-	query: string
+	query: string,
+	port: string
 ) {
+	if(port == null) port = "1433";
 	const sqlConfig = {
 		user: user,
 		password: password,
 		database: db, // this is the default database
 		server: ip,
+		port: port,
 		pool: {
 			max: 1,
 			min: 0,

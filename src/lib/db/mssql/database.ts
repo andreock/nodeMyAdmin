@@ -4,13 +4,16 @@ import type { Database } from 'src/app';
 export async function get_all_dbs_mssql(
 	ip: string,
 	user: string,
-	password: string
+	password: string,
+	port: string
 ): Promise<Array<string>> {
+	if(port == null) port = "1433";
 	const sqlConfig = {
 		user: user,
 		password: password,
 		database: 'master', // this is the default database
 		server: ip,
+		port: port,
 		pool: {
 			max: 1,
 			min: 0,
@@ -31,12 +34,14 @@ export async function get_all_dbs_mssql(
 	}
 }
 
-export async function create_db_mssql(ip: string, user: string, password: string, db: string) {
+export async function create_db_mssql(ip: string, user: string, password: string, db: string, port: string) {
+	if(port == null) port = "1433";
 	const sqlConfig = {
 		user: user,
 		password: password,
 		database: 'master', // this is the default database
 		server: ip,
+		port: port,
 		pool: {
 			max: 1,
 			min: 0,
