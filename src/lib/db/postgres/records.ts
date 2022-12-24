@@ -39,7 +39,7 @@ export async function delete_record_postgres(ip: string, user: string, pass: str
             username: user,
             password: pass,
         });
-        const query_where = "where" + parse_query_postgres(keys, rows);
+        const query_where = parse_query_postgres(keys, rows);
         await sql`delete from ${sql(table)} ${sql(query_where)};`;
         sql.end();
     } catch (error) {
@@ -64,7 +64,7 @@ export async function add_record_postgres(ip: string, user: string, pass: string
     }
 }
 
-export async function update_record_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string, keys: Array<string>, rows: Array<string>, old_keys: string, old_rows: string) {
+export async function update_record_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string, keys: Array<string>, rows: Array<string>, old_keys: Array<string>, old_rows: Array<string>) {
     if(port == null) throw new Error("Invalid port");
     try {
         const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
@@ -78,9 +78,9 @@ export async function update_record_postgres(ip: string, user: string, pass: str
         keys.forEach(function callback (key, i){
             new_record[key] = rows[i]
         });
-        const query_where = parse_query_postgres(old_keys, old_rows);
-        await sql`update ${sql(table)} set ${sql(new_record)}
-        where ${sql(query_where)}`;
+        const query_where = parse_query_postgres(old_keys, old_rows).replace("where ", "");
+        const result = await sql`update ${sql(table)} set ${sql(new_record)} where ${query_where}`;
+        console.log(result)
         sql.end();
     } catch (error) {
         throw error;

@@ -280,7 +280,7 @@ export const actions = {
 
 
 		try {
-			if (type == 'MySql') {ù
+			if (type == 'MySql') {
 				const query = parse_query(keys, rows, table);
 				await delete_record_mysql(ip, user, pass, db, query);
 			} else if (type == 'MSSQL') {

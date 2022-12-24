@@ -2,7 +2,7 @@ export function parse_query_postgres(
 	keys: Array<string>,
 	rows: Array<string | Date | boolean>,
 ) {
-	let query = '';
+	let query = 'where ';
 	
 	keys.forEach(function callback(key, i) {
 		if (typeof rows[i] == 'string' && rows[i].includes('T')) {
@@ -22,14 +22,12 @@ export function parse_query_postgres(
 					query += `${key} = '${rows[i]}' AND `; // The boolean and number must be written in query without quotes, with quotes became a string and broke the WHERE clause
 				else query += `${key} = ${rows[i]} AND `;
 			} else {
-				console.log("OKOKOK")
 				if (typeof rows[i] != 'boolean' && isNaN(rows[i]))
 					query += `${key} = '${rows[i]}' `; // The last where don't need AND
 				else query += `${key} = ${rows[i]} `; // The last where don't need AND
 			}
 		}
 	});
-	console.log(query);
 	return query;
 }
 

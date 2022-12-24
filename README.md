@@ -7,7 +7,7 @@ nodeMyAdmin want to replace phpMyAdmin and want to add support to several DB eng
 # Features
 
 - MySQL/MariaDB support
-- PostgreSQL support
+- PostgreSQL beta support(Modify record is currently broken and don't change record)
 - MSSQL support
 - Creation of database
 - Creation of tables
