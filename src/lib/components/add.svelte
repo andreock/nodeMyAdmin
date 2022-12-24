@@ -77,8 +77,8 @@
 		<div class="mb-3">
 			{#each rows as row}
 				<label for={row.name} class="form-label">{row.name + ' - Type: ' + row.type}</label>
-				{#if row.type == 253 || row.type == 167}
-					<!--Is a string-->
+				{#if row.type == 253 || row.type == 167 || row.type == 25}
+					<!--Is a string MYSQL MSSQL POSTGRESQL-->
 					<input type="text" id={row.name} class="form-control" />
 				{:else if row.type == 12 || row.type == 61 || row.type == 7}
 					<!--Is a date-->

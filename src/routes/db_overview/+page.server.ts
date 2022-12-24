@@ -39,7 +39,8 @@ import {
 import { parse_query } from '$lib/db/helper/helper';
 import { parse_query_update_mysql } from '$lib/db/mysql/helper';
 import { parse_query_update_mssql } from '$lib/db/mssql/helper';
-import { add_record_postgres, delete_record_postgres, records_postgres } from '$lib/db/postgres/records';
+import { add_record_postgres, delete_record_postgres, records_postgres, update_record_postgres } from '$lib/db/postgres/records';
+import { parse_query_postgres, parse_query_update_postgres } from '$lib/db/postgres/helper';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ request, cookies }) {
@@ -277,18 +278,19 @@ export const actions = {
 		const keys = Object.keys(values_raw[index]);
 		const rows = Object.values(values_raw[index]);
 
-		const query = parse_query(keys, rows, table);
 
 		try {
-			if (type == 'MySql') {
+			if (type == 'MySql') {ù
+				const query = parse_query(keys, rows, table);
 				await delete_record_mysql(ip, user, pass, db, query);
 			} else if (type == 'MSSQL') {
+				const query = parse_query(keys, rows, table);
 				await delete_record_mssql(ip, user, pass, db, table, query);
 			} else if (type == 'PostgreSQL') {
 				if (port == null) {
 					port = "5432";
 				}
-				await delete_record_postgres(ip, user, pass, port, db, query)
+				await delete_record_postgres(ip, user, pass, port, db, table, keys, rows)
 			}
 			return { success: true, type: 'delete' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -302,7 +304,9 @@ export const actions = {
 		const values = form.get('values');
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
-		const ip = decrypt(cookies.get('ip'));
+		let ip = decrypt(cookies.get('ip'));
+		let port = ip.split(':')[1];
+		ip = ip.split(':')[0];
 		const db = form.get('db');
 		const table = form.get('table');
 		const old_table = form.get('old_db');
@@ -326,6 +330,12 @@ export const actions = {
 					parse_query(old_keys, old_rows, table).replace('DELETE FROM ' + table, '');
 
 				await update_record_mssql(ip, user, pass, db, table, query);
+			} else if (type == 'PostgreSQL') {
+				if (port == null) {
+					port = "5432";
+				}
+				// const query = parse_query_update_postgres(keys, rows, table) + parse_query_postgres(old_keys, old_rows, table).replace('DELETE FROM ' + table, '');
+				await update_record_postgres(ip, user, pass, port, db, table, keys, rows, old_keys, old_rows);
 			}
 			return { success: true, type: 'update' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -351,7 +361,7 @@ export const actions = {
 				await add_record_mysql(ip, user, pass, db, table, records);
 			} else if (type == 'MSSQL') {
 				await add_record_mssql(ip, user, pass, db, table, JSON.parse(records));
-			}else if (type == 'PostgreSQL') {
+			} else if (type == 'PostgreSQL') {
 				if (port == null) {
 					port = "5432";
 				}

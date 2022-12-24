@@ -121,11 +121,11 @@ export async function create_table_postgres(ip: string, user: string, pass: stri
             username: user,
             password: pass,
         });
-        let query = 'CREATE TABLE IF NOT EXISTS ' + table + ' (';
+        let query = '';
         fields.forEach((field) => (query += field + ','));
         query = query.slice(0, -1) + '';
-        query += ')';
-        await sql`${sql(query)}`;
+        console.log(query);
+        await sql`CREATE TABLE IF NOT EXISTS ${sql(table)} ( ${sql(query)} )`;
         sql.end();
     } catch (error) {
         throw error;
