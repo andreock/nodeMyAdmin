@@ -66,6 +66,13 @@
 				}
 			});
 	}
+	function debug_unknown_type(type: number) {
+		console.log(
+			"We don't know this type, if you see this message, please open issue on github and indicate type number, db engine and what this number should be."
+		);
+		console.log('DEBUG: type id ' + type);
+		return '';	// We don't want to see any string in our html code
+	}
 </script>
 
 <DialogContent>
@@ -74,7 +81,7 @@
 		<div class="mb-3">
 			{#each rows as row}
 				<label for={row.name} class="form-label">{row.name + ' - Type: ' + row.type}</label>
-				{#if row.type == 253 || row.type == 167}
+				{#if row.type == 253 || row.type == 167 || row.type == 25}
 					<!--Is a string-->
 					<input type="text" id={row.name} class="form-control" />
 				{:else if row.type == 12 || row.type == 61 || row.type == 7}
@@ -88,14 +95,19 @@
 						<input class="form-check-input" type="checkbox" id={row.name} />
 						<label class="form-check-label" for="flexCheckChecked"> False </label>
 					</div>
-				{:else if row.type == 56 || row.type == 2}
+				{:else if row.type == 56 || row.type == 2 || row.type == 23}
 					<input type="number" id={row.name} class="form-control" />
+				{:else}
+					<!--Log unknown type to add it later-->
+						{debug_unknown_type(row.type)}
+						<input type="text" id={row.name} class="form-control" />
+						<!-- if we don't know type, use a simple string -->
 				{/if}
 				<br />
 			{/each}
 		</div>
 		<a href="#0" on:click={() => window.open('https://stackoverflow.com/a/64774749')}
-			>Types number</a
+			>Types number(MYSQL)</a
 		>
 	</svelte:fragment>
 	<svelte:fragment slot="footer">

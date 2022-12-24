@@ -1,7 +1,8 @@
 import { redirect } from '@sveltejs/kit';
 import mysql from 'mysql2/promise';
 import { encrypt } from '$lib/crypto/aes';
-import sql from 'mssql';
+import { login_mssql } from '$lib/db/mssql/login';
+import postgres from 'postgres';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
@@ -19,93 +20,73 @@ export async function load({ params, cookies }) {
 export const actions = {
 	login: async ({ cookies, request }) => {
 		const form_data = await request.formData();
-		const ip = form_data.get('ip');
+		let ip = form_data.get('ip');
 		const user = form_data.get('user');
 		const pass = form_data.get('pass');
 		const type = form_data.get('type');
+		let port = ip.split(':')[1];
+		ip = ip.split(':')[0];
 
 		try {
 			if (type == 'MySql') {
+				if(port == null) {
+					port = 3306;	// default port
+				}
 				await mysql.createConnection({
 					host: ip,
 					user: user,
-					database: 'sys',
-					password: pass
+					database: 'sys',	// default db
+					password: pass, 
+					port: port
 				});
 			} else if (type == 'MSSQL') {
-				const sqlConfig = {
-					user: user,
-					password: pass,
-					database: 'master', // default database
-					server: ip,
-					pool: {
-						max: 1,
-						min: 0,
-						idleTimeoutMillis: 30000
-					},
-					options: {
-						encrypt: true, // for azure
-						trustServerCertificate: true // change to true for local dev / self-signed certs
-					}
-				};
-				await sql.connect(sqlConfig);
+				if(port == null) {
+                    port = 1433;
+				}
+				login_mssql(user, pass, ip, port);
+			} else if (type == 'PostgreSQL') {
+				if(port == null) {
+                    port = 5432;
+                }
+				postgres(`postgres://${user}:${pass}@${ip}:${port}/postgres`, {
+					host: ip,           
+					port: port,
+					database: 'postgres',            // default db
+					username: user,            
+					password: pass,        
+				});
 			}
 		} catch (error) {
 			console.error(error);
 			return { success: false };
 		}
 
-		// Save all in cookies, we need for other actions
 		await cookies.set('ip', encrypt(ip), {
-			// send cookie for every page
 			path: '/',
-			// server side only cookie so you can't use `document.cookie`
 			httpOnly: true,
-			// only requests from same site can send cookies
-			// https://developer.mozilla.org/en-US/docs/Glossary/CSRF
 			sameSite: 'strict',
-			// only sent over HTTPS in production
 			secure: process.env.NODE_ENV === 'production',
-			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
 		await cookies.set('user', encrypt(user), {
-			// send cookie for every page
 			path: '/',
-			// server side only cookie so you can't use `document.cookie`
 			httpOnly: true,
-			// only requests from same site can send cookies
-			// https://developer.mozilla.org/en-US/docs/Glossary/CSRF
 			sameSite: 'strict',
-			// only sent over HTTPS in production
 			secure: process.env.NODE_ENV === 'production',
-			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
 		await cookies.set('pass', encrypt(pass), {
-			// send cookie for every page
 			path: '/',
-			// server side only cookie so you can't use `document.cookie`
 			httpOnly: true,
-			// only requests from same site can send cookies
-			// https://developer.mozilla.org/en-US/docs/Glossary/CSRF
 			sameSite: 'strict',
-			// only sent over HTTPS in production
 			secure: process.env.NODE_ENV === 'production',
-			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
 		await cookies.set('type', encrypt(type), {
-			// send cookie for every page
 			path: '/',
-			// server side only cookie so you can't use `document.cookie`
 			httpOnly: true,
-			// only requests from same site can send cookies
-			// https://developer.mozilla.org/en-US/docs/Glossary/CSRF
 			sameSite: 'strict',
-			// only sent over HTTPS in production
 			secure: process.env.NODE_ENV === 'production',
-			// set cookie to expire after a month
 			maxAge: 60 * 60 * 24 * 30
 		});
 		throw redirect(302, '/');

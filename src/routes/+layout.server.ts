@@ -1,13 +1,16 @@
 import { decrypt } from '$lib/crypto/aes';
 import { get_all_dbs_mysql } from '$lib/db/mysql/database';
 import { get_all_dbs_mssql } from '$lib/db/mssql/database';
+import { get_all_dbs_postgres } from '$lib/db/postgres/database';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
 	const pass = decrypt(cookies.get('pass'));
 	const user = decrypt(cookies.get('user'));
-	const ip = decrypt(cookies.get('ip'));
+	let ip = decrypt(cookies.get('ip'));
 	const type = decrypt(cookies.get('type'));
+	let port = ip?.split(':')[1];
+	ip = ip?.split(':')[0];
 
 	const databases: Array<string> = [];
 
@@ -20,7 +23,6 @@ export async function load({ params, cookies }) {
 		try {
 			
 			if (type == 'MySql') {
-				console.log("OK")
 				return {
 					success: true,
 					databases: await get_all_dbs_mysql(ip, user, pass)
@@ -30,6 +32,12 @@ export async function load({ params, cookies }) {
 					success: true,
 					databases: await get_all_dbs_mssql(ip, user, pass)
 				};
+			}else if (type == 'PostgreSQL') {
+				if(port == null) port = "5432";
+				return {
+					success: true,
+					databases: await get_all_dbs_postgres(ip, user, pass, port)
+				};	
 			}
 		} catch (error) {
 			console.error(error);
