@@ -1,4 +1,6 @@
 import postgres from 'postgres';
+import { parse_query } from '../helper/helper';
+import { parse_query_postgres } from './helper';
 
 export async function get_all_tables_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string) {
     try {
@@ -113,6 +115,8 @@ export async function truncate_table_postgres(ip: string, user: string, pass: st
 
 export async function create_table_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string, fields: Array<string>) {
     try {
+        console.error("CREATE TABLE DON'T WORK AND IS REMOVED");
+        return;
         if (port == null) throw new Error("Invalid port");
         const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
             host: ip,
@@ -129,5 +133,35 @@ export async function create_table_postgres(ip: string, user: string, pass: stri
         sql.end();
     } catch (error) {
         throw error;
+    }
+}
+
+export async function search_in_table_postgres(
+	ip: string,
+	user: string,
+	pass: string,
+	db: string,
+	table: string,
+    port: string,
+	records: object
+) {
+	try {
+		const keys = Object.keys(records);
+		const rows = Object.values(records);
+		// let query = parse_query(keys, rows, table);
+		// query = query.replace('DELETE FROM', 'SELECT * FROM');
+        if (port == null) throw new Error("Invalid port");
+        const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
+            host: ip,
+            port: parseInt(port),
+            database: db,            // default db
+            username: user,
+            password: pass,
+        });
+        const query_where = parse_query_postgres(keys, rows);
+        const rows_raw = await sql`select * from ${sql(table)} ${sql(query_where)};`;
+		return rows_raw;
+	} catch (error) {
+        console.error(error);
     }
 }

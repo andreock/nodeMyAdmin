@@ -34,7 +34,7 @@ import {
 	create_table_postgres,
 	delete_field_postgres,
 	drop_table_postgres,
-	get_all_tables_postgres, struct_postgres, truncate_table_postgres
+	get_all_tables_postgres, search_in_table_postgres, struct_postgres, truncate_table_postgres
 } from '$lib/db/postgres/table';
 import { parse_query } from '$lib/db/helper/helper';
 import { parse_query_update_mysql } from '$lib/db/mysql/helper';
@@ -334,7 +334,6 @@ export const actions = {
 				if (port == null) {
 					port = "5432";
 				}
-				// const query = parse_query_update_postgres(keys, rows, table) + parse_query_postgres(old_keys, old_rows, table).replace('DELETE FROM ' + table, '');
 				await update_record_postgres(ip, user, pass, port, db, table, keys, rows, old_keys, old_rows);
 			}
 			return { success: true, type: 'update' };
@@ -440,7 +439,9 @@ export const actions = {
 	search: async ({ cookies, request }) => {
 		const pass = decrypt(cookies.get('pass'));
 		const user = decrypt(cookies.get('user'));
-		const ip = decrypt(cookies.get('ip'));
+		let ip = decrypt(cookies.get('ip'));
+		let port = ip.split(':')[1];
+		ip = ip.split(':')[0];
 		const form = await request.formData();
 		const db = form.get('db');
 		const table = form.get('table');
@@ -462,6 +463,17 @@ export const actions = {
 					type: 'search',
 					rows: JSON.stringify(
 						await search_in_table_mssql(ip, user, pass, db, table, JSON.parse(records))
+					)
+				};
+			} else if (type == 'PostgreSQL') {
+				if (port == null) {
+					port = "5432";
+				}
+				return {
+					success: true,
+					type: 'search',
+					rows: JSON.stringify(
+						await search_in_table_postgres(ip, user, pass, db, table, port, JSON.parse(records))
 					)
 				};
 			}

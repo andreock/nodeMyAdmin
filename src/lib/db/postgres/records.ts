@@ -1,4 +1,3 @@
-import { query } from 'mssql';
 import postgres from 'postgres';
 import { parse_query_postgres } from './helper';
 
@@ -30,8 +29,10 @@ export async function records_postgres(ip: string, user: string, pass: string, p
 }
 
 export async function delete_record_postgres(ip: string, user: string, pass: string, port: string | undefined, db: string | undefined, table: string, keys: Array<string>, rows: Array<string>): Promise<void> {
-    if(port == null) throw new Error("Invalid port");
     try {
+        if(port == null) throw new Error("Invalid port");
+        console.error("DELETE RECORD IS BROKEN AND IS NOT IMPLEMENTED CURRENTLY");
+        return;
         const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
             host: ip,
             port: parseInt(port),
