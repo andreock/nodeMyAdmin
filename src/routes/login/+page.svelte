@@ -16,6 +16,9 @@
 <section>
 	<div class="login">
 		<form method="POST" action="?/login">
+			<div class="center">
+				<img src="/logo.png" alt="nodemyadmin logo"/>
+			</div>	
 			<div class="mb-3">
 				<label for="exampleInputEmail1" class="form-label">Server IP</label>
 				<input
@@ -73,5 +76,8 @@
 		background-color: white;
 		border-radius: 8px;
 		padding: 20px;
+	}
+	.center {
+		text-align: center;
 	}
 </style>

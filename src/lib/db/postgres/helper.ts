@@ -1,15 +1,12 @@
-export function parse_query_postgres(
-	keys: Array<string>,
-	rows: Array<string | Date | boolean>,
-) {
+export function parse_query_postgres(keys: Array<string>, rows: Array<string | Date | boolean>) {
 	let query = 'where ';
-	
+
 	keys.forEach(function callback(key, i) {
 		if (typeof rows[i] == 'string' && rows[i].includes('T')) {
 			// Is a date, we need to convert it to MySql DateTime
 			try {
-				const date  = new Date(rows[i]);
-				date.setHours(date.getHours() + 1);	// We need to add an hour to convert to MySql Date successfully
+				const date = new Date(rows[i]);
+				date.setHours(date.getHours() + 1); // We need to add an hour to convert to MySql Date successfully
 				rows[i] = date.toISOString().slice(0, 19).replace('T', ' ');
 			} catch (error) {
 				console.error(error);
@@ -33,7 +30,8 @@ export function parse_query_postgres(
 
 export function parse_query_update_postgres(
 	keys: Array<string>,
-	rows: Array<string | Date | boolean>): string {
+	rows: Array<string | Date | boolean>
+): string {
 	let query = '';
 	keys.forEach(function callback(key, i) {
 		if (typeof rows[i] == 'string' && rows[i].includes('T')) {
@@ -46,16 +44,20 @@ export function parse_query_update_postgres(
 		}
 
 		if (i != keys.length - 1 && rows[i] != '') {
-            if (typeof rows[i]!= 'boolean' && isNaN(rows[i]))   // number and boolean don't need quotes
-			    query += key + ' = ' + "'" + rows[i] + "',"; // We may need to convert this form to a template string
-            else
-                query += key + ' = ' + rows[i] + ","; // We may need to convert this form to a template string
-
+			if (typeof rows[i] != 'boolean' && isNaN(rows[i]))
+				// number and boolean don't need quotes
+				query +=
+					key +
+					' = ' +
+					"'" +
+					rows[i] +
+					"',"; // We may need to convert this form to a template string
+			else query += key + ' = ' + rows[i] + ','; // We may need to convert this form to a template string
 		} else if (rows[i] != '') {
-            if (typeof rows[i]!= 'boolean' && isNaN(rows[i]))   // number and boolean don't need quotes
-			    query += key + ' = ' + "'" + rows[i] + "'";			// The last where don't need AND
-            else
-                query += key + ' = ' + rows[i] + "'"; // We may need to convert this form to a template string
+			if (typeof rows[i] != 'boolean' && isNaN(rows[i]))
+				// number and boolean don't need quotes
+				query += key + ' = ' + "'" + rows[i] + "'"; // The last where don't need AND
+			else query += key + ' = ' + rows[i] + "'"; // We may need to convert this form to a template string
 		}
 	});
 

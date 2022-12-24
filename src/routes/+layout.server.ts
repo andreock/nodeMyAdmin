@@ -21,23 +21,25 @@ export async function load({ params, cookies }) {
 		};
 	} else {
 		try {
-			
 			if (type == 'MySql') {
+				if (port == null) {
+					port = '3306';
+				}
 				return {
 					success: true,
-					databases: await get_all_dbs_mysql(ip, user, pass)
+					databases: await get_all_dbs_mysql(ip, user, pass, port)
 				};
 			} else if (type == 'MSSQL') {
 				return {
 					success: true,
-					databases: await get_all_dbs_mssql(ip, user, pass)
+					databases: await get_all_dbs_mssql(ip, user, pass, port)
 				};
-			}else if (type == 'PostgreSQL') {
-				if(port == null) port = "5432";
+			} else if (type == 'PostgreSQL') {
+				if (port == null) port = '5432';
 				return {
 					success: true,
 					databases: await get_all_dbs_postgres(ip, user, pass, port)
-				};	
+				};
 			}
 		} catch (error) {
 			console.error(error);
