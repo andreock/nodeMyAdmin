@@ -22,6 +22,7 @@ export async function load({ cookies }) {
 	if (user == null || pass == null || ip == null || type == null) {
 		throw redirect(301, '/login');
 	}
+	
 	try {
 		if (type == 'MySql') {
 			version = await get_mysql_version(ip, user, pass);
