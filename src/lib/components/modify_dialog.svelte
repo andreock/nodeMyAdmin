@@ -7,12 +7,12 @@
 		cols,
 		old_db: Array<object>;
 
-		function update() {
-			let records_new = structuredClone(records); // Need because if we update records, we will update also old_db and this broke WHERE clause
+	function update() {
+		let records_new = structuredClone(records); // Need because if we update records, we will update also old_db and this broke WHERE clause
 
-			Object.keys(records_new[index]).forEach((key, i) => {
-				const input = document.getElementById('update' + i);
-				if (input instanceof HTMLInputElement) records_new[index][key] = input.value;
+		Object.keys(records_new[index]).forEach((key, i) => {
+			const input = document.getElementById('update' + i);
+			if (input instanceof HTMLInputElement) records_new[index][key] = input.value;
 		});
 
 		var myHeaders = new Headers();
@@ -56,7 +56,7 @@
 					{value}
 				/>
 				<br />
-			{:else if typeof(value) == "number"}
+			{:else if typeof value == 'number'}
 				<label for="exampleInputEmail1" class="form-label">{cols[i]}</label>
 				<input
 					type="number"

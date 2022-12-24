@@ -67,7 +67,7 @@
 			"We don't know this type, if you see this message, please open issue on github and indicate type number, db engine and what this number should be."
 		);
 		console.log('DEBUG: type id ' + type);
-		return '';	// We don't want to see any string in our html code
+		return ''; // We don't want to see any string in our html code
 	}
 </script>
 
@@ -99,7 +99,7 @@
 					<!--Is a number-->
 					<input type="number" id={row.name} class="form-control" />
 				{:else}
-				<!--Log unknown type to add it later-->
+					<!--Log unknown type to add it later-->
 					{debug_unknown_type(row.type)}
 					<input type="text" id={row.name} class="form-control" />
 					<!-- if we don't know type, use a simple string -->

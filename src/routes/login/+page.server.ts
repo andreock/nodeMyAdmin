@@ -29,31 +29,31 @@ export const actions = {
 
 		try {
 			if (type == 'MySql') {
-				if(port == null) {
-					port = 3306;	// default port
+				if (port == null) {
+					port = 3306; // default port
 				}
 				await mysql.createConnection({
 					host: ip,
 					user: user,
-					database: 'sys',	// default db
-					password: pass, 
+					database: 'sys', // default db
+					password: pass,
 					port: port
 				});
 			} else if (type == 'MSSQL') {
-				if(port == null) {
-                    port = 1433;
+				if (port == null) {
+					port = 1433;
 				}
 				login_mssql(user, pass, ip, port);
 			} else if (type == 'PostgreSQL') {
-				if(port == null) {
-                    port = 5432;
-                }
+				if (port == null) {
+					port = 5432;
+				}
 				postgres(`postgres://${user}:${pass}@${ip}:${port}/postgres`, {
-					host: ip,           
+					host: ip,
 					port: port,
-					database: 'postgres',            // default db
-					username: user,            
-					password: pass,        
+					database: 'postgres', // default db
+					username: user,
+					password: pass
 				});
 			}
 		} catch (error) {

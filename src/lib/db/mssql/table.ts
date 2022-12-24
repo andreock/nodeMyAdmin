@@ -8,7 +8,7 @@ export async function get_all_tables_mssql(
 	db: string,
 	port: string
 ): Promise<string> {
-	if(port == null) port = "1433";
+	if (port == null) port = '1433';
 	const sqlConfig = {
 		user: user,
 		password: password,
@@ -47,7 +47,7 @@ export async function create_table_mssql(
 	fields: Array<string>,
 	port: string
 ) {
-	if(port == null) port = "1433";
+	if (port == null) port = '1433';
 	const sqlConfig = {
 		user: user,
 		password: password,
@@ -85,7 +85,7 @@ export async function drop_table_mssql(
 	table: string,
 	port: string
 ) {
-	if(port == null) port = "1433";
+	if (port == null) port = '1433';
 	const sqlConfig = {
 		user: user,
 		password: password,
@@ -119,7 +119,7 @@ export async function truncate_table_mssql(
 	table: string,
 	port: string
 ) {
-	if(port == null) port = "1433";
+	if (port == null) port = '1433';
 	const sqlConfig = {
 		user: user,
 		password: password,
@@ -154,7 +154,7 @@ export async function delete_field_mssql(
 	col: string,
 	port: string
 ) {
-	if(port == null) port = "1433";
+	if (port == null) port = '1433';
 	const sqlConfig = {
 		user: user,
 		password: password,
@@ -190,7 +190,7 @@ export async function search_in_table_mssql(
 	port: string
 ) {
 	try {
-		if(port == null) port = "1433";
+		if (port == null) port = '1433';
 		const keys = Object.keys(records);
 		const rows = Object.values(records);
 		let query = parse_query(keys, rows, table);
@@ -219,7 +219,6 @@ export async function search_in_table_mssql(
 	}
 }
 
-
 export async function struct_mssql(
 	ip: string,
 	user: string,
@@ -228,7 +227,7 @@ export async function struct_mssql(
 	table: string,
 	port: string
 ) {
-	if(port == null) port = "1433";
+	if (port == null) port = '1433';
 	const sqlConfig = {
 		user: user,
 		password: password,

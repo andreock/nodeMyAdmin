@@ -6,7 +6,7 @@ export async function get_mssql_version(
 	password: string,
 	port: string
 ): Promise<string> {
-	if(port == null) port = "1433";
+	if (port == null) port = '1433';
 	const sqlConfig = {
 		user: user,
 		password: password,

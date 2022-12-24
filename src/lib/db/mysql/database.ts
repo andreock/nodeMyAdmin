@@ -7,7 +7,7 @@ export async function get_all_dbs_mysql(
 	port: string
 ): Promise<Array<string>> {
 	try {
-		if(port == null) port = "3306";
+		if (port == null) port = '3306';
 		const databases: Array<string> = [];
 		const connection = await mysql.createConnection({
 			host: ip,
@@ -28,9 +28,15 @@ export async function get_all_dbs_mysql(
 	}
 }
 
-export async function create_db_mysql(ip: string, user: string, pass: string, db: string, port: string) {
+export async function create_db_mysql(
+	ip: string,
+	user: string,
+	pass: string,
+	db: string,
+	port: string
+) {
 	try {
-		if(port == null) port = "3306";
+		if (port == null) port = '3306';
 		const connection = await mysql.createConnection({
 			host: ip,
 			user: user,

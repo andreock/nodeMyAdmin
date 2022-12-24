@@ -7,7 +7,7 @@ export async function get_all_dbs_mssql(
 	password: string,
 	port: string
 ): Promise<Array<string>> {
-	if(port == null) port = "1433";
+	if (port == null) port = '1433';
 	const sqlConfig = {
 		user: user,
 		password: password,
@@ -34,8 +34,14 @@ export async function get_all_dbs_mssql(
 	}
 }
 
-export async function create_db_mssql(ip: string, user: string, password: string, db: string, port: string) {
-	if(port == null) port = "1433";
+export async function create_db_mssql(
+	ip: string,
+	user: string,
+	password: string,
+	db: string,
+	port: string
+) {
+	if (port == null) port = '1433';
 	const sqlConfig = {
 		user: user,
 		password: password,

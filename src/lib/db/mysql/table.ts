@@ -1,9 +1,15 @@
 import mysql from 'mysql2/promise';
 import { parse_query } from '../helper/helper';
 
-export async function get_all_tables_mysql(ip: string, user: string, pass: string, db: string, port: string) {
+export async function get_all_tables_mysql(
+	ip: string,
+	user: string,
+	pass: string,
+	db: string,
+	port: string
+) {
 	try {
-		if(port == null) port = "3306";
+		if (port == null) port = '3306';
 		const tables: Array<string> = []; // The tables in database
 		const connection = await mysql.createConnection({
 			host: ip,
@@ -34,7 +40,7 @@ export async function create_table_mysql(
 	port: string
 ) {
 	try {
-		if(port == null) port = "3306";
+		if (port == null) port = '3306';
 		const connection = await mysql.createConnection({
 			host: ip,
 			user: user,
@@ -62,7 +68,7 @@ export async function drop_table_mysql(
 	port: string
 ) {
 	try {
-		if(port == null) port = "3306";
+		if (port == null) port = '3306';
 		const connection = await mysql.createConnection({
 			host: ip,
 			user: user,
@@ -87,7 +93,7 @@ export async function delete_field_mysql(
 	port: string
 ) {
 	try {
-		if(port == null) port = "3306";
+		if (port == null) port = '3306';
 		const connection = await mysql.createConnection({
 			host: ip,
 			user: user,
@@ -112,7 +118,7 @@ export async function truncate_table_mysql(
 	port: string
 ) {
 	try {
-		if(port == null) port = "3306";
+		if (port == null) port = '3306';
 		const connection = await mysql.createConnection({
 			host: ip,
 			user: user,
@@ -137,7 +143,7 @@ export async function search_in_table_mysql(
 	port: string
 ) {
 	try {
-		if(port == null) port = "3306";
+		if (port == null) port = '3306';
 		const keys = Object.keys(records);
 		const rows = Object.values(records);
 		let query = parse_query(keys, rows, table);

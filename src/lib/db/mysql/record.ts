@@ -9,7 +9,7 @@ export async function records_mysql(
 	port: string
 ) {
 	try {
-		if(port == null) port = "3306";
+		if (port == null) port = '3306';
 		const cols: Array<unknown> = [];
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const rows: Array<any> = [];
@@ -47,7 +47,7 @@ export async function struct_mysql(
 	port: string
 ) {
 	try {
-		if(port == null) port = "3306";
+		if (port == null) port = '3306';
 		const connection = await mysql.createConnection({
 			host: ip,
 			user: user,
@@ -98,7 +98,7 @@ export async function delete_record_mysql(
 	port: string
 ) {
 	try {
-		if(port == null) port = "3306";
+		if (port == null) port = '3306';
 		const connection = await mysql.createConnection({
 			host: ip,
 			user: user,
@@ -123,7 +123,7 @@ export async function update_record_mysql(
 	port: string
 ) {
 	try {
-		if(port == null) port = "3306";
+		if (port == null) port = '3306';
 		const connection = await mysql.createConnection({
 			host: ip,
 			user: user,
