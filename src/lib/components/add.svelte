@@ -13,7 +13,7 @@
 		urlencoded.append('db', db);
 		urlencoded.append('table', table);
 
-		var requestOptions = {
+		var requestOptions: RequestInit = {
 			method: 'POST',
 			headers: myHeaders,
 			body: urlencoded,
@@ -45,7 +45,7 @@
 		urlencoded.append('table', table);
 		urlencoded.append('records', JSON.stringify(records));
 
-		var requestOptions = {
+		var requestOptions: RequestInit  = {
 			method: 'POST',
 			headers: myHeaders,
 			body: urlencoded,

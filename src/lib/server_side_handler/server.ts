@@ -339,7 +339,7 @@ export class Server {
 		}
     }
 
-    async Create(table: string, fields: string){
+    async Create(table: string, fields: string[]){
 		try {
 			if (this.#type == 'MySql') {
 				create_table_mysql(this.#ip, this.#user, this.#pass, this.#db, table, fields, this.#port);

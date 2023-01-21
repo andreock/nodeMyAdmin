@@ -1,55 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { Server } from '$lib/server_side_handler/server';
 import { decrypt } from '$lib/crypto/aes';
-import {
-	create_table_mysql,
-	delete_field_mysql,
-	drop_table_mysql,
-	get_all_tables_mysql,
-	search_in_table_mysql,
-	truncate_table_mysql
-} from '$lib/db/mysql/table';
-import {
-	create_table_mssql,
-	delete_field_mssql,
-	drop_table_mssql,
-	get_all_tables_mssql,
-	search_in_table_mssql,
-	struct_mssql,
-	truncate_table_mssql
-} from '$lib/db/mssql/table';
-import {
-	add_record_mysql,
-	delete_record_mysql,
-	records_mysql,
-	struct_mysql,
-	update_record_mysql
-} from '$lib/db/mysql/record';
-import {
-	add_record_mssql,
-	delete_record_mssql,
-	records_mssql,
-	update_record_mssql
-} from '$lib/db/mssql/record';
-import {
-	create_table_postgres,
-	delete_field_postgres,
-	drop_table_postgres,
-	get_all_tables_postgres,
-	search_in_table_postgres,
-	struct_postgres,
-	truncate_table_postgres
-} from '$lib/db/postgres/table';
-import { parse_query } from '$lib/db/helper/helper';
-import { parse_query_update_mysql } from '$lib/db/mysql/helper';
-import { parse_query_update_mssql } from '$lib/db/mssql/helper';
-import {
-	add_record_postgres,
-	delete_record_postgres,
-	records_postgres,
-	update_record_postgres
-} from '$lib/db/postgres/records';
-import { parse_query_postgres, parse_query_update_postgres } from '$lib/db/postgres/helper';
 
 const handler = new Server();
 
