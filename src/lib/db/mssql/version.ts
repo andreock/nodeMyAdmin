@@ -1,5 +1,7 @@
 import mssql from 'mssql';
+import { Logger } from '../helper/helper';
 
+const logger = new Logger();
 export async function get_mssql_version(
 	ip: string,
 	user: string,
@@ -29,6 +31,6 @@ export async function get_mssql_version(
 		const result = await mssql.query`SELECT @@VERSION AS 'SQL Server Version Details'`;
 		return result.recordset[0]['SQL Server Version Details'];
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }

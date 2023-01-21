@@ -1,6 +1,8 @@
 import postgres from 'postgres';
 import { parse_query_postgres } from './helper';
+import { Logger } from '../helper/helper';
 
+const logger = new Logger();
 export async function records_postgres(
 	ip: string,
 	user: string,
@@ -31,7 +33,7 @@ export async function records_postgres(
 				rows: []
 			};
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -59,7 +61,7 @@ export async function delete_record_postgres(
 		await sql`delete from ${sql(table)} ${sql(query_where)};`;
 		sql.end();
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -84,7 +86,7 @@ export async function add_record_postgres(
 		await sql`insert into ${sql(table)} ${sql(records)}`;
 		sql.end();
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -117,6 +119,6 @@ export async function update_record_postgres(
 		await sql`update ${sql(table)} set ${sql(new_record)} where ${query_where}`;
 		sql.end();
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }

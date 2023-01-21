@@ -1,5 +1,7 @@
 import postgres from 'postgres';
+import { Logger } from '../helper/helper';
 
+const logger = new Logger();
 export async function get_all_dbs_postgres(
 	ip: string,
 	user: string,

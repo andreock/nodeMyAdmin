@@ -1,5 +1,8 @@
 import mssql from 'mssql';
 import type { Database } from 'src/app';
+import { Logger } from '../helper/helper';
+
+const logger = new Logger();
 
 export async function get_all_dbs_mssql(
 	ip: string,
@@ -29,7 +32,7 @@ export async function get_all_dbs_mssql(
 		const result = await mssql.query`SELECT name FROM master.dbo.sysdatabases`;
 		return result.recordset.map((x: Database) => x.name);
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }
 
@@ -62,6 +65,6 @@ export async function create_db_mssql(
 		await mssql.connect(sqlConfig);
 		await mssql.query('CREATE DATABASE ' + db);
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }

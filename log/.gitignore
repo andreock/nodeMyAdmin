@@ -1,0 +1,2 @@
+# Ignore log file during developing stage
+*.log

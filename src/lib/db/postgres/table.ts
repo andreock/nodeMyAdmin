@@ -1,7 +1,9 @@
 import postgres from 'postgres';
 import { parse_query } from '../helper/helper';
 import { parse_query_postgres } from './helper';
+import { Logger } from '../helper/helper';
 
+const logger = new Logger();
 export async function get_all_tables_postgres(
 	ip: string,
 	user: string,
@@ -30,7 +32,7 @@ export async function get_all_tables_postgres(
 			return tables.map((table) => table.tablename);
 		}
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -72,7 +74,7 @@ export async function struct_postgres(
 			};
 		});
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -98,7 +100,7 @@ export async function delete_field_postgres(
 		sql.end();
 		return tables.map((table) => table.table_name);
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -122,7 +124,7 @@ export async function drop_table_postgres(
 		await sql`DROP TABLE ${sql(table)}`;
 		sql.end();
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -146,7 +148,7 @@ export async function truncate_table_postgres(
 		await sql`TRUNCATE TABLE ${sql(table)}`;
 		sql.end();
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -176,7 +178,7 @@ export async function create_table_postgres(
 		await sql`CREATE TABLE IF NOT EXISTS ${sql(table)} ( ${sql(query)} )`;
 		sql.end();
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 

@@ -1,6 +1,8 @@
 import mssql from 'mssql';
 import { parse_query } from '../helper/helper';
+import { Logger } from '../helper/helper';
 
+const logger = new Logger();
 export async function get_all_tables_mssql(
 	ip: string,
 	user: string,
@@ -34,7 +36,7 @@ export async function get_all_tables_mssql(
 		});
 		return tables;
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }
 
@@ -73,7 +75,7 @@ export async function create_table_mssql(
 		await mssql.connect(sqlConfig);
 		await mssql.query(query);
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }
 
@@ -107,7 +109,7 @@ export async function drop_table_mssql(
 		await mssql.connect(sqlConfig);
 		await mssql.query('DROP TABLE ' + db + '.dbo.' + table);
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }
 
@@ -141,7 +143,7 @@ export async function truncate_table_mssql(
 		await mssql.connect(sqlConfig);
 		await mssql.query('TRUNCATE TABLE ' + db + '.dbo.' + table);
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }
 
@@ -176,7 +178,7 @@ export async function delete_field_mssql(
 		await mssql.connect(sqlConfig);
 		await mssql.query('ALTER TABLE ' + db + '.dbo.' + table + ' DROP COLUMN ' + col);
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }
 
@@ -215,7 +217,7 @@ export async function search_in_table_mssql(
 		const result = await mssql.query(query);
 		return result.recordset;
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }
 
@@ -264,6 +266,6 @@ export async function struct_mssql(
 		});
 		return cols;
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }

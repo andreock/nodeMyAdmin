@@ -1,5 +1,7 @@
 import mysql from 'mysql2/promise';
+import { Logger } from '../helper/helper';
 
+const logger = new Logger();
 export async function get_all_dbs_mysql(
 	ip: string,
 	user: string,
@@ -24,7 +26,7 @@ export async function get_all_dbs_mysql(
 		connection.destroy();
 		return databases;
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -48,6 +50,6 @@ export async function create_db_mysql(
 		await connection.query('CREATE DATABASE ' + db);
 		connection.destroy();
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }

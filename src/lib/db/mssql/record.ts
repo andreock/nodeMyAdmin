@@ -1,5 +1,7 @@
 import mssql from 'mssql';
+import { Logger } from '../helper/helper';
 
+const logger = new Logger();
 export async function records_mssql(
 	ip: string,
 	user: string,
@@ -31,7 +33,7 @@ export async function records_mssql(
 		const records = await mssql.query('SELECT * FROM ' + db + '.dbo.' + table);
 		return records.recordset;
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }
 
@@ -77,7 +79,7 @@ export async function add_record_mssql(
 			.join(','); // Row of table to insert
 		await mssql.query(`INSERT INTO ${db}.dbo.${table} (${cols}) VALUES (${values})`);
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }
 
@@ -112,7 +114,7 @@ export async function delete_record_mssql(
 		await mssql.connect(sqlConfig);
 		await mssql.query(query.replace(table, `${db}.dbo.${table}`));
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }
 
@@ -147,6 +149,6 @@ export async function update_record_mssql(
 		await mssql.connect(sqlConfig);
 		await mssql.query(query.replace(table, `${db}.dbo.${table}`));
 	} catch (err) {
-		throw err;
+		logger.Error(err);
 	}
 }
