@@ -1,6 +1,6 @@
 export function parse_query_update_mysql(
 	keys: Array<string>,
-	rows: Array<string | Date | boolean>,
+	rows: Array<unknown>,
 	table: string
 ): string {
 	let query = 'UPDATE ' + table + ' SET ';

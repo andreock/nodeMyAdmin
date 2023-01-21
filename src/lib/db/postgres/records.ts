@@ -46,7 +46,6 @@ export async function delete_record_postgres(
 	rows: Array<string>
 ): Promise<void> {
 	try {
-		if (port == null) throw new Error('Invalid port');
 		console.error('DELETE RECORD IS BROKEN AND IS NOT IMPLEMENTED CURRENTLY');
 		return;
 		const sql = postgres(`postgres://${user}:${pass}@${ip}:${port}/${db}`, {
@@ -97,9 +96,9 @@ export async function update_record_postgres(
 	db: string | undefined,
 	table: string,
 	keys: Array<string>,
-	rows: Array<string>,
+	rows: Array<unknown>,
 	old_keys: Array<string>,
-	old_rows: Array<string>
+	old_rows: Array<unknown>
 ) {
 	if (port == null) throw new Error('Invalid port');
 	try {
@@ -115,7 +114,7 @@ export async function update_record_postgres(
 			new_record[key] = rows[i];
 		});
 		const query_where = parse_query_postgres(old_keys, old_rows).replace('where ', '');
-		const result = await sql`update ${sql(table)} set ${sql(new_record)} where ${query_where}`;
+		await sql`update ${sql(table)} set ${sql(new_record)} where ${query_where}`;
 		sql.end();
 	} catch (error) {
 		throw error;

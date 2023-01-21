@@ -13,7 +13,7 @@
 		urlencoded.append('db', db);
 		urlencoded.append('table', table);
 
-		var requestOptions = {
+		var requestOptions: RequestInit = {
 			method: 'POST',
 			headers: myHeaders,
 			body: urlencoded,
@@ -24,6 +24,7 @@
 			.then((response) => response.json())
 			.then(async (result) => {
 				rows = result.data.records;
+				console.log(rows)
 			});
 	});
 	function add() {
@@ -44,7 +45,7 @@
 		urlencoded.append('table', table);
 		urlencoded.append('records', JSON.stringify(records));
 
-		var requestOptions = {
+		var requestOptions: RequestInit  = {
 			method: 'POST',
 			headers: myHeaders,
 			body: urlencoded,

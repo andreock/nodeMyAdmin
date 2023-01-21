@@ -8,7 +8,7 @@ export async function records_mssql(
 	table: string,
 	port: string
 ) {
-	if (port == null) port = '1433';
+	
 	const sqlConfig = {
 		user: user,
 		password: password,
@@ -44,7 +44,7 @@ export async function add_record_mssql(
 	records: object,
 	port: string
 ) {
-	if (port == null) port = '1433';
+	
 	const sqlConfig = {
 		user: user,
 		password: password,
@@ -90,7 +90,7 @@ export async function delete_record_mssql(
 	query: string,
 	port: string
 ) {
-	if (port == null) port = '1433';
+	
 	const sqlConfig = {
 		user: user,
 		password: password,
@@ -125,7 +125,7 @@ export async function update_record_mssql(
 	query: string,
 	port: string
 ) {
-	if (port == null) port = '1433';
+	
 	const sqlConfig = {
 		user: user,
 		password: password,
