@@ -32,6 +32,6 @@ export function decrypt(text: string) {
 		dec += decipher.final('utf8');
 		return dec;
 	} else {
-		return 'Null value'; // This is just a marker because without this typescript trasform this function return in string | null
+		return null; // This is just a marker because without this typescript trasform this function return in string | null
 	}
 }
