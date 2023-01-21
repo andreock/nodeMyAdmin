@@ -3,6 +3,9 @@ import mysql from 'mysql2/promise';
 import { encrypt } from '$lib/crypto/aes';
 import { login_mssql } from '$lib/db/mssql/login';
 import postgres from 'postgres';
+import { Logger } from '$lib/db/helper/helper';
+
+const logger = new Logger();
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
@@ -57,7 +60,7 @@ export const actions = {
 				});
 			}
 		} catch (error) {
-			console.error(error);
+			logger.Error(error);
 			return { success: false };
 		}
 

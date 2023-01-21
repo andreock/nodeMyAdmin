@@ -2,6 +2,9 @@ import { decrypt } from '$lib/crypto/aes';
 import { get_all_dbs_mysql } from '$lib/db/mysql/database';
 import { get_all_dbs_mssql } from '$lib/db/mssql/database';
 import { get_all_dbs_postgres } from '$lib/db/postgres/database';
+import { Logger } from '$lib/db/helper/helper';
+
+const logger = new Logger();
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
@@ -42,7 +45,7 @@ export async function load({ params, cookies }) {
 				};
 			}
 		} catch (error) {
-			console.error(error);
+			logger.Error(error);
 			return { success: false };
 		}
 	}

@@ -1,5 +1,7 @@
 import mysql from 'mysql2/promise';
+import { Logger } from '../helper/helper';
 
+const logger = new Logger();
 export async function records_mysql(
 	ip: string,
 	user: string,
@@ -34,7 +36,7 @@ export async function records_mysql(
 		connection.destroy(); // We need to close the connection to prevent saturation of max connections
 		return { cols: cols, rows: rows, cols_raw: cols_raw };
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -61,7 +63,7 @@ export async function struct_mysql(
 		connection.destroy(); // We need to close the connection to prevent saturation of max connections
 		return fields;
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -85,7 +87,7 @@ export async function add_record_mysql(
 		await connection.query('INSERT INTO ' + table + ' SET ?', JSON.parse(records));
 		connection.destroy(); // We need to close the connection to prevent saturation of max connections
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -110,7 +112,7 @@ export async function delete_record_mysql(
 		await connection.query(query);
 		connection.destroy(); // We need to close the connection to prevent saturation of max connections
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -135,6 +137,6 @@ export async function update_record_mysql(
 		await connection.query(query);
 		connection.destroy(); // We need to close the connection to prevent saturation of max connections
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }

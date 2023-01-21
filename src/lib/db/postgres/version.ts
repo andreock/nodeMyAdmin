@@ -1,5 +1,7 @@
 import postgres from 'postgres';
+import { Logger } from '../helper/helper';
 
+const logger = new Logger();
 export async function get_postgres_version(
 	ip: string,
 	user: string,

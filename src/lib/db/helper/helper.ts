@@ -1,3 +1,5 @@
+import { pino } from "pino";
+
 export function parse_query(
 	keys: Array<string>,
 	rows: Array<unknown>,
@@ -30,4 +32,31 @@ export function parse_query(
 		}
 	});
 	return query;
+}
+
+export class Logger{
+	#logger;
+
+	constructor(){
+		this.#logger = pino({
+			level: 'debug',
+			transport: {
+				target: 'pino-pretty',
+				options: {
+					colorize: true,
+					ignore: 'pid,hostname',
+					customColors: 'debug:green,info:yellow,warn:blue,error:bgRed',
+					destination: "log/nodemyadmin.log",
+					messageFormat: '{spacer}[{side}] - {msg}\n',
+					singleLine: true,
+					hideObject: true,
+					translateTime: 'yyyy-mm-dd-HH:MM:ss'
+				}
+			}
+		});
+	}
+
+	Error(msg){
+        this.#logger.error(msg);
+    }
 }

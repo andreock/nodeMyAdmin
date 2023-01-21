@@ -1,5 +1,7 @@
 import sql from 'mssql';
+import { Logger } from '../helper/helper';
 
+const logger = new Logger();
 export async function login_mssql(user: string, pass: string, ip: string, port: number) {
 	const sqlConfig = {
 		user: user,
@@ -20,6 +22,6 @@ export async function login_mssql(user: string, pass: string, ip: string, port: 
 	try {
 		await sql.connect(sqlConfig);
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }

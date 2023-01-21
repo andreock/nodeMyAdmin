@@ -7,6 +7,9 @@ import { create_db_mysql } from '$lib/db/mysql/database';
 import { create_db_mssql } from '$lib/db/mssql/database';
 import { get_postgres_version } from '$lib/db/postgres/version';
 import { create_db_postgres } from '$lib/db/postgres/database';
+import { Logger } from '$lib/db/helper/helper';
+
+const logger = new Logger();
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ cookies }) {
@@ -49,7 +52,7 @@ export async function load({ cookies }) {
 			}
 		};
 	} catch (error) {
-		console.error(error);
+		logger.Error(error);
 		return { success: false };
 	}
 }
@@ -85,7 +88,7 @@ export const actions = {
 			}
 			return { success: true };
 		} catch (error) {
-			console.error(error);
+			logger.Error(error);
 			return { success: false };
 		}
 	},

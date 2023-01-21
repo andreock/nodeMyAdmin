@@ -1,6 +1,8 @@
 import mysql from 'mysql2/promise';
 import { parse_query } from '../helper/helper';
+import { Logger } from '../helper/helper';
 
+const logger = new Logger();
 export async function get_all_tables_mysql(
 	ip: string,
 	user: string,
@@ -26,7 +28,7 @@ export async function get_all_tables_mysql(
 		connection.destroy(); // We need to close the connection to prevent saturation of max connections
 		return tables;
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -55,7 +57,7 @@ export async function create_table_mysql(
 		await connection.query(query);
 		connection.destroy(); // We need to close the connection to prevent saturation of max connections
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -79,7 +81,7 @@ export async function drop_table_mysql(
 		await connection.query('DROP TABLE ' + table);
 		connection.destroy(); // We need to close the connection to prevent saturation of max connections
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -105,7 +107,7 @@ export async function delete_field_mysql(
 		await connection.query('ALTER TABLE ' + table + ' DROP COLUMN ' + col); // Drop a column in a table
 		connection.destroy(); // We need to close the connection to prevent saturation of max connections
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 
@@ -129,7 +131,7 @@ export async function truncate_table_mysql(
 		await connection.query('TRUNCATE TABLE ' + table);
 		connection.destroy(); // We need to close the connection to prevent saturation of max connections
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
 

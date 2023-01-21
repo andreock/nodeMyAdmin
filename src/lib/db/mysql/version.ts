@@ -1,5 +1,7 @@
 import mysql from 'mysql2/promise';
+import { Logger } from '../helper/helper';
 
+const logger = new Logger();
 export async function get_mysql_version(
 	ip: string,
 	user: string,
@@ -23,6 +25,6 @@ export async function get_mysql_version(
 		if (typeof version === 'string') return version; // Version of db
 		else return '';
 	} catch (error) {
-		throw error;
+		logger.Error(error);
 	}
 }
