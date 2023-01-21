@@ -97,9 +97,9 @@ export async function update_record_postgres(
 	db: string | undefined,
 	table: string,
 	keys: Array<string>,
-	rows: Array<string>,
+	rows: Array<unknown>,
 	old_keys: Array<string>,
-	old_rows: Array<string>
+	old_rows: Array<unknown>
 ) {
 	if (port == null) throw new Error('Invalid port');
 	try {

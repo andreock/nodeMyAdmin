@@ -1,6 +1,6 @@
 export function parse_query(
 	keys: Array<string>,
-	rows: Array<string | Date | boolean>,
+	rows: Array<unknown>,
 	table: string
 ) {
 	let query = 'DELETE FROM ' + table + ' WHERE (';
