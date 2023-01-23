@@ -52,7 +52,7 @@ declare interface Information {
 }
 
 declare interface Row {
-	type: number;
+	type: number | string;
 	name: string;
 }
 
