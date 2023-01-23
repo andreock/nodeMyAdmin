@@ -6,13 +6,14 @@
 
 ## Porting of phpMyAdmin to Node.JS
 
-nodeMyAdmin want to replace phpMyAdmin using Sveltekit instead of the old PHP.
+A svelte-kit based alternative to phpMyAdmin with multi DB support
 
 # Features
 
 - MySQL/MariaDB support
 - PostgreSQL beta support(Modify record is currently broken and don't change record, Search in table return all records, delete records is broken and delete all records BE CAREFUL, Add table don't work)
 - MSSQL support
+- SQLite3 support
 - Creation of database
 - Creation of tables
 - View records or structure of tables, Add records, Search in tables, Truncate and Drop a table
