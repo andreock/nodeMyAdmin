@@ -4,7 +4,7 @@ import { encrypt } from '$lib/crypto/aes';
 import { login_mssql } from '$lib/db/mssql/login';
 import postgres from 'postgres';
 import { Logger } from '$lib/db/helper/helper';
-import sqlite3 from 'sqlite3';
+import fs from 'fs';
 
 const logger = new Logger();
 
@@ -60,12 +60,7 @@ export const actions = {
 					password: pass
 				});
 			} else if(type == "SQLite"){
-				let db = new sqlite3.Database(ip, (err) => {
-					if (err) {
-						logger.Error(err);
-					}
-					console.log('Connected to the chinook database.');
-				});
+				if(!fs.existsSync(ip)) return { success: false };
 			}
 		} catch (error) {
 			logger.Error(error);
