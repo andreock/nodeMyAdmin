@@ -24,7 +24,6 @@
 			.then((response) => response.json())
 			.then(async (result) => {
 				rows = result.data.records;
-				console.log(rows);
 			});
 	});
 	function add() {
