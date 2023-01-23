@@ -4,6 +4,7 @@ import { encrypt } from '$lib/crypto/aes';
 import { login_mssql } from '$lib/db/mssql/login';
 import postgres from 'postgres';
 import { Logger } from '$lib/db/helper/helper';
+import sqlite3 from 'sqlite3';
 
 const logger = new Logger();
 
@@ -23,7 +24,7 @@ export async function load({ params, cookies }) {
 export const actions = {
 	login: async ({ cookies, request }) => {
 		const form_data = await request.formData();
-		let ip = form_data.get('ip');
+		let ip = form_data.get('ip');	// Ip or path of DB
 		const user = form_data.get('user');
 		const pass = form_data.get('pass');
 		const type = form_data.get('type');
@@ -58,40 +59,65 @@ export const actions = {
 					username: user,
 					password: pass
 				});
+			} else if(type == "SQLite"){
+				let db = new sqlite3.Database(ip, (err) => {
+					if (err) {
+						logger.Error(err);
+					}
+					console.log('Connected to the chinook database.');
+				});
 			}
 		} catch (error) {
 			logger.Error(error);
 			return { success: false };
 		}
 
-		await cookies.set('ip', encrypt(ip), {
-			path: '/',
-			httpOnly: true,
-			sameSite: 'strict',
-			secure: process.env.NODE_ENV === 'production',
-			maxAge: 60 * 60 * 24 * 30
-		});
-		await cookies.set('user', encrypt(user), {
-			path: '/',
-			httpOnly: true,
-			sameSite: 'strict',
-			secure: process.env.NODE_ENV === 'production',
-			maxAge: 60 * 60 * 24 * 30
-		});
-		await cookies.set('pass', encrypt(pass), {
-			path: '/',
-			httpOnly: true,
-			sameSite: 'strict',
-			secure: process.env.NODE_ENV === 'production',
-			maxAge: 60 * 60 * 24 * 30
-		});
-		await cookies.set('type', encrypt(type), {
-			path: '/',
-			httpOnly: true,
-			sameSite: 'strict',
-			secure: process.env.NODE_ENV === 'production',
-			maxAge: 60 * 60 * 24 * 30
-		});
+		if(type != "SQLite"){
+			await cookies.set('ip', encrypt(ip), {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: process.env.NODE_ENV === 'production',
+				maxAge: 60 * 60 * 24 * 30
+			});
+			await cookies.set('user', encrypt(user), {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: process.env.NODE_ENV === 'production',
+				maxAge: 60 * 60 * 24 * 30
+			});
+			await cookies.set('pass', encrypt(pass), {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: process.env.NODE_ENV === 'production',
+				maxAge: 60 * 60 * 24 * 30
+			});
+			await cookies.set('type', encrypt(type), {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: process.env.NODE_ENV === 'production',
+				maxAge: 60 * 60 * 24 * 30
+			});
+		}else{	// SQLite don't need username and password
+			await cookies.set('ip', encrypt(ip), {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: process.env.NODE_ENV === 'production',
+				maxAge: 60 * 60 * 24 * 30
+			});
+			await cookies.set('type', encrypt(type), {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: process.env.NODE_ENV === 'production',
+				maxAge: 60 * 60 * 24 * 30
+			});
+		}
+
 		throw redirect(302, '/');
 	}
 };

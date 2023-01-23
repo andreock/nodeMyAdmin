@@ -7,6 +7,8 @@ import { add_record_mysql, delete_record_mysql, records_mysql, struct_mysql, upd
 import { create_table_mysql, delete_field_mysql, drop_table_mysql, get_all_tables_mysql, search_in_table_mysql, truncate_table_mysql } from "$lib/db/mysql/table";
 import { add_record_postgres, delete_record_postgres, records_postgres, update_record_postgres } from "$lib/db/postgres/records";
 import { create_table_postgres, delete_field_postgres, drop_table_postgres, get_all_tables_postgres, search_in_table_postgres, struct_postgres, truncate_table_postgres } from "$lib/db/postgres/table";
+import { add_record_sqlite, delete_record_sqlite, records_sqlite } from "$lib/db/sqlite3/records";
+import { create_table_sqlite, delete_field_sqlite, drop_table_sqlite, get_all_tables_sqlite, search_in_table_sqlite, struct_sqlite, truncate_table_sqlite } from "$lib/db/sqlite3/table";
 import { pino } from 'pino';
 
 export class Server {
@@ -27,7 +29,14 @@ export class Server {
     };
 
     CreateServer(user: string | null, pass: string | null, ip: string | null | undefined, port: string | undefined, type: string) {
-        if (ip == null || port == null || user == null || pass == null) throw new Error("Invalid parameters in login");
+
+        if(type == "SQLite" && ip != null && type != null){
+            this.#ip = ip;
+            this.#type = type;
+            return;
+        }
+
+        if (ip == null || port == null || user == null || pass == null) throw new Error("Invalid parameters in login"); // Exit because this is almost impossible
         this.#user = user;
         this.#pass = pass;
         this.#ip = ip;
@@ -46,6 +55,8 @@ export class Server {
                 return { db: this.#db, tables: get_all_tables_mssql(this.#ip, this.#user, this.#pass, this.#db, this.#port) };
             } else if (this.#type == 'PostgreSQL') {
                 return { db: this.#db, tables: await get_all_tables_postgres(this.#ip, this.#user, this.#pass, this.#port, this.#db) };
+            }else if(this.#type == 'SQLite'){
+                return { db: this.#db, tables: await get_all_tables_sqlite(this.#ip) };
             }
 
     }
@@ -88,6 +99,16 @@ export class Server {
                         };
                     })
                 };
+            }else if(this.#type == 'SQLite') {
+                const rows = await struct_sqlite(this.#ip, table);
+                return { success: true,
+                        records: rows.map((row) => {
+                            return {
+                                name: row.Field,
+                                type: row.Type
+                            };
+                        })
+                }
             }
     }
 
@@ -128,6 +149,18 @@ export class Server {
                     type: type_request,
                     db: this.#db
                 };
+            } else if(this.#type == 'SQLite') {
+                let result = await records_sqlite(this.#ip, query);
+                if(result[0] == null) result.push({});  // If the table is empty the array is empty so sveltekit can't return a null in the response of endpoint,
+                                                        // workaround: push an empty object so that object.keys will be an empty array.
+                return {
+                    records: result,
+                    cols: Object.keys(result[0]), // We take the first element since is always the same
+                    selected: table,
+                    query: query,
+                    type: type_request,
+                    db: this.#db
+                };
             }
     }
 
@@ -154,7 +187,14 @@ export class Server {
 					type: type_request,
 					db: this.#db
 				};
-			}
+			}else if(this.#type == 'SQLite') {
+				return {
+					cols: await struct_sqlite(this.#ip, table),
+					selected: table,
+					type: type_request,
+					db: this.#db
+				};
+            }
     }
 
     async Delete(table: string, col: string){
@@ -164,7 +204,9 @@ export class Server {
 				await delete_field_mssql(this.#ip, this.#user, this.#pass, this.#db, table, col, this.#port);
 			} else if (this.#type == 'PostgreSQL') {
 				await delete_field_postgres(this.#ip, this.#user, this.#pass, this.#port, this.#db, table, col);
-			}
+			} else if (this.#type == 'SQLite') {
+                await delete_field_sqlite(this.#ip, table, col);
+            }
 			return { success: true, type: 'delete' };
     }
 
@@ -177,7 +219,10 @@ export class Server {
 				await delete_record_mssql(this.#ip, this.#user, this.#pass, this.#db, table, query, this.#port);
 			} else if (this.#type == 'PostgreSQL') {
 				await delete_record_postgres(this.#ip, this.#user, this.#pass, this.#port, this.#db, table, keys, rows);
-			}
+			} else if (this.#type == 'SQLite') {
+                const query = parse_query(keys, rows, table);
+                await delete_record_sqlite(this.#ip, query);
+            }
 			return { success: true, type: 'delete' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
@@ -206,7 +251,7 @@ export class Server {
 					old_keys,
 					old_rows
 				);
-			}
+			}else if(this.#type == 'SQLite') {}
 			return { success: true, type: 'update' };
     }
 
@@ -218,9 +263,10 @@ export class Server {
 				await add_record_mssql(this.#ip, this.#user, this.#pass, this.#db, table, JSON.parse(records), this.#port);
 			} else if (this.#type == 'PostgreSQL') {
 				await add_record_postgres(this.#ip, this.#user, this.#pass, this.#port, this.#db, table, JSON.parse(records));
-			}
+			} else if (this.#type == 'SQLite') {
+                await add_record_sqlite(this.#ip, table, JSON.parse(records));
+            }
 			return { success: true, type: 'add' };
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
 
     async Truncate(table: string){
@@ -230,9 +276,10 @@ export class Server {
 				await truncate_table_mssql(this.#ip, this.#user, this.#pass, this.#db, table, this.#port);
 			} else if (this.#type == 'PostgreSQL') {
 				await truncate_table_postgres(this.#ip, this.#user, this.#pass, this.#port, this.#db, table);
-			}
+			} else if (this.#type == 'SQLite') {
+                await truncate_table_sqlite(this.#ip, table);
+            }
 			return { success: true, type: 'truncate' };
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
 
     async Drop(table: string){
@@ -242,7 +289,9 @@ export class Server {
 				await drop_table_mssql(this.#ip, this.#user, this.#pass, this.#db, table, this.#port);
 			} else if (this.#type == 'PostgreSQL') {
 				await drop_table_postgres(this.#ip, this.#user, this.#pass, this.#port, this.#db, table);
-			}
+			}else if(this.#type == 'SQLite') {
+                await drop_table_sqlite(this.#ip, table);
+            }
 			return { success: true, type: 'drop' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
@@ -272,7 +321,15 @@ export class Server {
 						await search_in_table_postgres(this.#ip, this.#user, this.#pass, this.#db, table, this.#port, JSON.parse(records))
 					)
 				};
-			}
+			} else if (this.#type == 'SQLite') {
+                return {
+					success: true,
+					type: 'search',
+					rows: JSON.stringify(
+						await search_in_table_sqlite(this.#ip, table, JSON.parse(records))
+					)
+				};
+            }
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
 
@@ -282,7 +339,7 @@ export class Server {
 			} else if (this.#type == 'MSSQL') create_table_mssql(this.#ip, this.#user, this.#pass, this.#db, table, fields, this.#port);
 			else if (this.#type == 'PostgreSQL') {
 				create_table_postgres(this.#ip, this.#user, this.#pass, this.#port, this.#db, table, fields);
-			}
+			} else if (this.#type == 'SQLite') create_table_sqlite(this.#ip, table, fields);
 			return { success: true, type: 'create' };
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
     }

@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { dialogs } from 'svelte-dialogs';
 
+	let type: string;
 	/** @type {import('./$types').PageForm} */
 	export let form: Login_Response;
 
@@ -20,45 +21,48 @@
 				<img src="/logo.png" alt="nodemyadmin logo"/>
 			</div>	
 			<div class="mb-3">
-				<label for="exampleInputEmail1" class="form-label">Server IP</label>
+				<label for="exampleInputEmail1" class="form-label">Server IP/Path(SQLite)</label>
 				<input
 					type="text"
 					class="form-control"
 					id="exampleInputEmail1"
 					aria-describedby="emailHelp"
-					placeholder="Ip of DB server, es. 127.0.0.1:5432, for default port you don't need to specify it"
+					placeholder="Ip of DB server or absolute path of sqlite file"
 					name="ip"
 				/>
 			</div>
 			<div class="mb-3">
 				<label for="exampleInputPassword1" class="form-label">Type of server</label>
-				<select class="form-select" name="type">
+				<select class="form-select" name="type" bind:value={type}>
 					<option selected value="MySql">MySQL / MariaDB</option>
 					<option value="MSSQL">MSSQL</option>
 					<option value="PostgreSQL">PostgreSQL</option>
+					<option value="SQLite">SQLite</option>
 				</select>
 			</div>
-			<div class="mb-3">
-				<label for="exampleInputPassword1" class="form-label">User of server</label>
-				<input
-					type="text"
-					class="form-control"
-					id="exampleInputPassword1"
-					placeholder="User of DB"
-					value="root"
-					name="user"
-				/>
-			</div>
-			<div class="mb-3">
-				<label for="exampleInputPassword1" class="form-label">Password of server</label>
-				<input
-					type="password"
-					class="form-control"
-					id="exampleInputPassword1"
-					placeholder="Password of DB"
-					name="pass"
-				/>
-			</div>
+			{#if type != "SQLite"}
+				<div class="mb-3">
+					<label for="exampleInputPassword1" class="form-label">User of server</label>
+					<input
+						type="text"
+						class="form-control"
+						id="exampleInputPassword1"
+						placeholder="User of DB"
+						value="root"
+						name="user"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="exampleInputPassword1" class="form-label">Password of server</label>
+					<input
+						type="password"
+						class="form-control"
+						id="exampleInputPassword1"
+						placeholder="Password of DB"
+						name="pass"
+					/>
+				</div>
+			{/if}
 			<div class="d-flex justify-content-center">
 				<button type="submit" class="btn btn-primary">Login</button>
 			</div>

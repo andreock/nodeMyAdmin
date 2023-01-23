@@ -6,11 +6,20 @@ const handler = new Server();
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ request, cookies }) {
+	let ip: string | null | undefined = decrypt(cookies.get('ip'));
+	const type = decrypt(cookies.get('type'));
+
+	if(type == "SQLite"){
+		const url = request.url;
+		const params = url.split('?')[1];
+		let db = params.split('=')[1];
+		handler.CreateServer(null, null, ip, undefined, type);
+		handler.ChangeDB(db);
+		return handler.GetAllTables();
+	}
 
 	const pass = decrypt(cookies.get('pass'));
 	const user = decrypt(cookies.get('user'));
-	let ip: string | null | undefined = decrypt(cookies.get('ip'));
-	const type = decrypt(cookies.get('type'));
 	let port = ip?.split(':')[1];
 	ip = ip?.split(':')[0];
 
@@ -78,6 +87,7 @@ export const actions = {
 		const rows = Object.values(values_raw[index]);
 		return handler.DeleteRecord(table, keys, rows);
 	},
+
 	update: async ({ request }) => {
 		const form = await request.formData();
 		const values = form.get('values');
@@ -89,9 +99,10 @@ export const actions = {
 		const rows = Object.values(JSON.parse(values));
 		const old_keys = Object.keys(JSON.parse(old_table));
 		const old_rows = Object.values(JSON.parse(old_table));
-
+		
 		return handler.Update(table, keys, rows, old_keys, old_rows);
 	},
+
 	add: async ({ request }) => {
 		const form = await request.formData();
 		const table = form.get('table');

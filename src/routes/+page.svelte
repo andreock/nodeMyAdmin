@@ -2,7 +2,7 @@
 	import type { Information } from 'src/app';
 	import { onMount } from 'svelte';
 
-	const version = '1.2';
+	const version = '1.4';	// Version of nodeMyAdmin
 
 	/** @type {import('./$types').PageData} */
 	export let data: Information;
@@ -29,7 +29,7 @@
 					<table class="table table-striped table-primary">
 						<thead>
 							<tr>
-								<th scope="col">Database</th>
+								<th scope="col">Database information</th>
 								<th />
 							</tr>
 						</thead>
@@ -42,14 +42,23 @@
 								<th scope="row">Engine version: {data.db?.version}</th>
 								<th />
 							</tr>
-							<tr>
-								<th scope="row">IP: {data.db.ip}</th>
-								<th />
-							</tr>
-							<tr>
-								<th scope="row">User: {data.db.user}</th>
-								<th />
-							</tr>
+							{#if data.db.type != "SQLite"}
+								<tr>
+									<th scope="row">IP: {data.db.ip}</th>
+									<th />
+								</tr>
+							{:else}
+								<tr>
+									<th scope="row">Path: {data.db.ip}</th>
+									<th />
+								</tr>
+							{/if}
+							{#if data.db.type != "SQLite"}
+								<tr>
+									<th scope="row">User: {data.db.user}</th>
+									<th />
+								</tr>
+							{/if}
 						</tbody>
 					</table>
 				</div>
@@ -57,7 +66,7 @@
 					<table class="table table-striped table-primary">
 						<thead>
 							<tr>
-								<th scope="col">Web server</th>
+								<th scope="col">Web server information</th>
 								<th />
 							</tr>
 						</thead>

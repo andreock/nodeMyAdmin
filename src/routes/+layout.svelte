@@ -14,7 +14,7 @@
 <div class="app">
 	<Header />
 	{#if $page.url.pathname != '/login'}
-		<Sidebar databases={data.databases} {form} />
+		<Sidebar databases={data.databases} {form} type={data.type}/>
 	{/if}
 	<main>
 		<slot />

@@ -1,11 +1,23 @@
+# MacOS file
 .DS_Store
+
+# Node modules
 node_modules
-/build
+
+
+# Sveltekit temp folder
 /.svelte-kit
 /package
+
+# Configurations
 .env
 .env.*
 !.env.example
-.vercel
-.output
+
+
+# Build artifacts
 *.zip
+/build
+
+# Test DB sqlite3
+test.db

@@ -8,20 +8,43 @@ import { create_db_mssql } from '$lib/db/mssql/database';
 import { get_postgres_version } from '$lib/db/postgres/version';
 import { create_db_postgres } from '$lib/db/postgres/database';
 import { Logger } from '$lib/db/helper/helper';
+import { get_sqlite_version } from '$lib/db/sqlite3/version';
 
 const logger = new Logger();
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ cookies }) {
-	const pass = decrypt(cookies.get('pass'));
-	const user = decrypt(cookies.get('user'));
+
 	let ip = decrypt(cookies.get('ip'));
 	const type = decrypt(cookies.get('type')); // type of db
+
+	let version = ''; // version  of DB
+
+	if(ip == null) throw redirect(301, '/login');
+
+	if(type == "SQLite"){
+		version = await get_sqlite_version(ip);
+
+		return {
+			success: true,
+			version: process.version, // Node js Version
+			os: process.platform, // OS where NodeMyAdmin is running
+			db: {
+				user: "",
+				pass: "",
+				ip: ip,
+				type: type,
+				version: version
+			}
+		};
+	}
+	
+	const pass = decrypt(cookies.get('pass'));
+	const user = decrypt(cookies.get('user'));
 	let port = ip?.split(':')[1];
 	ip = ip?.split(':')[0];
 
-	let version = ''; // version  of DB
-	if (user == null || pass == null || ip == null || type == null) {
+	if (user == null || pass == null || type == null) {
 		throw redirect(301, '/login');
 	}
 

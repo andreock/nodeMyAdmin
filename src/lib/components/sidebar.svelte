@@ -5,7 +5,11 @@
 	import { dialogs } from 'svelte-dialogs';
 	import NewDb from './new_db.svelte';
 
-	export let databases, form;
+	export let databases, form, type;
+	let length = 0;
+	if(type == "SQLite"){
+		length = databases.split("/").length;
+	}
 
 	onMount(() => document.getElementById(form)?.classList.add('active'));
 </script>
@@ -21,14 +25,24 @@
 				>
 					<Fa icon={faPlus} /><span class="dbname">New database</span>
 				</button>
-				{#each databases as database}
+				{#if type != "SQLite"}
+					{#each databases as database}
+						<form method="POST" action="/?/db">
+							<button class="list-group-item list-group-item-action py-2 ripple" id={database}>
+								<Fa icon={faDatabase} /><span class="dbname">{database}</span>
+							</button>
+							<input type="hidden" value={database} name="db" />
+						</form>
+					{/each}
+				{:else}
 					<form method="POST" action="/?/db">
-						<button class="list-group-item list-group-item-action py-2 ripple" id={database}>
-							<Fa icon={faDatabase} /><span class="dbname">{database}</span>
+						<!-- Sanitize database name from path and get only name -->
+						<button class="list-group-item list-group-item-action py-2 ripple" id={databases.split("/")[length - 1]}>
+							<Fa icon={faDatabase} /><span class="dbname">{databases.split("/")[length - 1]}</span>
 						</button>
-						<input type="hidden" value={database} name="db" />
+						<input type="hidden" value={databases} name="db" />
 					</form>
-				{/each}
+				{/if}
 			</div>
 		</div>
 	</nav>

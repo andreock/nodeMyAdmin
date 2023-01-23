@@ -8,19 +8,32 @@ const logger = new Logger();
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, cookies }) {
-	const pass = decrypt(cookies.get('pass'));
-	const user = decrypt(cookies.get('user'));
-	let ip = decrypt(cookies.get('ip'));
+
 	const type = decrypt(cookies.get('type'));
-	let port = ip?.split(':')[1];
-	ip = ip?.split(':')[0];
+
+	let ip = decrypt(cookies.get('ip'));
 
 	const databases: Array<string> = [];
+
+	const pass = decrypt(cookies.get('pass'));
+	const user = decrypt(cookies.get('user'));
+
+	if(type == "SQLite"){
+		return {
+			success: true,
+			databases: ip,
+			type: type
+		}
+	}
+
+	let port = ip?.split(':')[1];
+	ip = ip?.split(':')[0];
 
 	if (user == null || pass == null || ip == null || type == null) {
 		return {
 			success: true,
-			databases: databases
+			databases: databases,
+			type: type
 		};
 	} else {
 		try {
@@ -30,18 +43,21 @@ export async function load({ params, cookies }) {
 				}
 				return {
 					success: true,
-					databases: await get_all_dbs_mysql(ip, user, pass, port)
+					databases: await get_all_dbs_mysql(ip, user, pass, port),
+					type: type
 				};
 			} else if (type == 'MSSQL') {
 				return {
 					success: true,
-					databases: await get_all_dbs_mssql(ip, user, pass, port)
+					databases: await get_all_dbs_mssql(ip, user, pass, port),
+					type: type
 				};
 			} else if (type == 'PostgreSQL') {
 				if (port == null) port = '5432';
 				return {
 					success: true,
-					databases: await get_all_dbs_postgres(ip, user, pass, port)
+					databases: await get_all_dbs_postgres(ip, user, pass, port),
+					type: type
 				};
 			}
 		} catch (error) {
